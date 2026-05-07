@@ -71,7 +71,118 @@
     .task-status{display:inline-flex;border-radius:999px;padding:3px 8px;font-size:.72rem;font-weight:600;border:1px solid var(--border);background:#fff;color:var(--muted);margin-top:6px}
     .task-status.overdue-label{background:#FFF1F2;color:var(--danger);border-color:#FFD5D8}
     .task-status.done-label{background:#E9FBF1;color:var(--success);border-color:#BFEFD2}
+
+    /* --- VERSÃO MAIS LIMPA / MENOS POLUÍDA --- */
+    :root{
+      --bg:#F8FCFD;
+      --surface-2:#FBFEFF;
+      --border:#DDEBF0;
+      --shadow:none;
+      --shadow-sm:none;
+    }
+    body{background:#FAFDFE}
+    main{padding:28px 32px}
+    .page-head{margin-bottom:18px;align-items:center}
+    .page-head h1{font-size:1.55rem;letter-spacing:-.035em}
+    .page-head p{font-size:.88rem;margin-top:4px;max-width:720px}
+    .eyebrow{display:none}
+    .pill{padding:7px 12px;font-size:.76rem;font-weight:600;background:#0B8793}
+    .card{border-color:#E0ECF0;border-radius:14px;padding:16px}
+    .card h2{font-size:1.08rem}.card h3{font-size:.98rem}
+    .btn{font-size:.78rem;font-weight:500;padding:7px 10px;border-radius:9px;gap:5px}
+    .btn .icon{width:15px;height:15px}
+    .btn-primary{background:#0B8793}
+    .control{border-radius:10px;padding:10px 12px;font-size:.88rem;background:#fff}
+    textarea.control{min-height:96px}
+    .grid{gap:12px}.two-col{grid-template-columns:minmax(300px,.72fr) 1.35fr;gap:18px}
+    .search-row{margin-bottom:12px}.search{border-radius:12px;min-width:240px}.search input{padding:11px 0;font-size:.88rem}
+    .select-small{min-width:130px}
+    .badge{font-size:.67rem;padding:4px 8px;font-weight:600}
+    .item-card{min-height:auto}.item-footer{padding-top:8px}
+    .item-card p{font-size:.86rem;line-height:1.45;-webkit-line-clamp:4}
+    .segment{border-radius:12px;margin-bottom:12px;background:#F1F7F9}.seg-btn{height:36px;font-size:.82rem;border-radius:9px}.seg-btn.active{box-shadow:none;border:1px solid var(--border)}
+    .tutorial-add,.library{min-height:auto}
+    .library-empty{min-height:190px}
+    .quick-help{display:none}
+    .tutorial-list{display:flex;flex-direction:column;gap:8px}
+    .tutorial-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid var(--border);border-radius:12px;padding:12px;background:#fff}
+    .tutorial-row h3{font-size:.95rem;margin:6px 0 3px;line-height:1.25}
+    .tutorial-row .desc{font-size:.82rem;line-height:1.35;color:var(--muted);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+    .tutorial-preview{margin-top:8px;color:var(--muted);font-size:.82rem;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+    .tutorial-row .actions{justify-content:flex-end;gap:6px;min-width:220px}
+    .tutorial-row .btn{padding:6px 8px;font-size:.76rem}
+    .tutorial-body,.video-box{background:transparent;border:0;padding:0;max-height:none;overflow:hidden;color:var(--muted);font-weight:400}
+    .ready-head{margin-top:22px;padding-top:18px}
+    .task-demo{font-size:.82rem;padding:9px 11px;border-radius:12px;background:#F6FCFD}
+    .kanban{gap:12px}.kan-col{padding:12px;border-radius:14px;min-height:300px}.kan-drop{min-height:225px}.task{padding:11px;border-radius:11px}.task .actions{gap:6px}.task-title{font-size:.9rem}.task-desc{font-size:.82rem}
+
+
+    /* --- TUTORIAIS MAIS LIMPO: sem ações espremidas ao lado do título --- */
+    #tab-tutoriais .two-col{grid-template-columns:minmax(280px,360px) minmax(0,1fr)}
+    .tutorial-row{display:block;border-radius:12px;padding:13px 14px}
+    .tutorial-row h3{max-width:100%;font-size:.92rem;line-height:1.32;margin:7px 0 2px;word-break:normal}
+    .tutorial-row .desc{max-width:100%;font-size:.8rem;line-height:1.35;-webkit-line-clamp:1}
+    .tutorial-preview{max-width:100%;font-size:.79rem;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#607385}
+    .tutorial-row .actions{margin-top:10px;padding-top:9px;border-top:1px solid #EEF5F7;justify-content:flex-start;gap:7px;min-width:0;flex-wrap:wrap}
+    .tutorial-row .actions .btn{padding:6px 8px;font-size:.74rem;min-height:30px}
+    .tutorial-row .actions .btn-danger{padding:6px 7px}
+    .tutorial-row .badge{font-size:.63rem;padding:3px 8px}
+    @media(max-width:1100px){#tab-tutoriais .two-col{grid-template-columns:1fr}.tutorial-add{max-width:none}}
+
     @media(max-width:980px){#sidebar{position:static;width:100%;height:auto}.nav-list{flex-direction:row;overflow:auto}.profile{display:none}body{display:block}main{margin:0;width:100%;padding:24px}.two-col,.kanban{grid-template-columns:1fr}.page-head{flex-direction:column}.quick-help{grid-template-columns:1fr}.pill{white-space:normal}.grid{grid-template-columns:1fr}}
+
+
+    /* --- AJUSTE MOBILE FINAL: uso confortável no celular --- */
+    .mobile-move{display:none}
+    @media(max-width:760px){
+      body{display:block;background:#F7FBFC;padding-bottom:76px}
+      #sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;width:100%;height:68px;border-right:0;border-top:1px solid var(--border);box-shadow:0 -8px 22px rgba(7,35,56,.08);z-index:90}
+      .brand,.profile{display:none}
+      .nav-list{height:100%;padding:6px 8px;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;overflow:visible}
+      .nav-item{flex-direction:column;justify-content:center;gap:3px;padding:6px 2px;border-radius:11px;font-size:.64rem;line-height:1.1;text-align:center;white-space:normal}
+      .nav-item .icon{width:17px;height:17px}
+      main{margin:0;width:100%;max-width:none;padding:16px 12px 92px}
+      .page-head{margin-bottom:14px;gap:10px}
+      .page-head h1{font-size:1.42rem;letter-spacing:-.035em}
+      .page-head p{font-size:.86rem;line-height:1.4}
+      .eyebrow{font-size:.68rem;margin-bottom:4px}
+      .pill{font-size:.72rem;padding:8px 10px;white-space:normal;width:100%;justify-content:center;text-align:center}
+      .card{border-radius:14px;padding:14px}
+      .card h2{font-size:1rem;margin-bottom:12px!important}
+      .two-col{grid-template-columns:1fr!important;gap:12px}
+      .grid{grid-template-columns:1fr;gap:10px}
+      .search-row{display:grid;grid-template-columns:1fr;gap:8px}
+      .search{min-width:0;width:100%;border-radius:12px}
+      .select-small,.control{width:100%;min-width:0}
+      .control{min-height:44px;font-size:16px;padding:10px 12px}
+      textarea.control{font-size:16px;min-height:96px}
+      .btn{min-height:38px;font-size:.78rem;font-weight:500;padding:8px 10px}
+      .btn-primary{width:100%}
+      .modal{padding:10px;align-items:flex-end}
+      .modal-box{border-radius:20px 20px 0 0;max-height:88vh;padding:18px}
+      .modal-actions{display:grid;grid-template-columns:1fr;gap:8px}
+      .modal-actions .btn{width:100%}
+      #toast{left:12px;right:12px;bottom:86px}.toast{border-radius:12px;font-size:.84rem}
+
+      #tab-tutoriais .two-col{grid-template-columns:1fr!important}
+      .segment{grid-template-columns:repeat(3,1fr);gap:3px;padding:3px}
+      .seg-btn{height:38px;font-size:.75rem}
+      .tutorial-list{gap:9px}
+      .tutorial-row{padding:12px;border-radius:12px}
+      .tutorial-row .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+      .tutorial-row .actions .btn{width:100%;justify-content:center;min-height:36px}
+      .tutorial-preview{font-size:.78rem;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+      .kanban{display:flex;overflow-x:auto;gap:10px;padding-bottom:8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+      .kan-col{min-width:84vw;scroll-snap-align:start;min-height:320px;padding:12px}
+      .kan-drop{min-height:230px}
+      .task{padding:12px;cursor:default}
+      .task .actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+      .task .actions .btn{width:100%}
+      .mobile-move{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:9px;padding-top:9px;border-top:1px solid var(--border)}
+      .mobile-move button{border:1px solid var(--border);background:#fff;border-radius:10px;padding:8px 5px;font-size:.72rem;color:var(--muted);font-weight:500}
+      .mobile-move button.active{background:var(--primary-soft);color:var(--primary-dark);border-color:var(--primary-border)}
+    }
   </style>
 </head>
 <body>
@@ -134,7 +245,7 @@
     </section>
 
     <section id="tab-tutoriais" class="tab tutorial-page">
-      <div class="page-head"><div><h1>Tutoriais & vídeos</h1><p>Anexe textos, links e vídeos de como mexer no app, baixar, enviar documentos e acompanhar protocolo.</p></div><span class="pill">Prazo principal: até 2 dias úteis após o afastamento</span></div>
+      <div class="page-head"><div><h1>Tutoriais & vídeos</h1><p>Salve tutoriais curtos para copiar, consultar ou abrir durante o atendimento.</p></div><span class="pill">Prazo principal: até 2 dias úteis após o afastamento</span></div>
       <div class="two-col">
         <div class="card tutorial-add">
           <h2 style="margin-bottom:18px">Adicionar tutorial</h2>
@@ -147,11 +258,12 @@
           <div class="field"><input id="tutorial-title" class="control" placeholder="Título"></div>
           <div class="field"><input id="tutorial-desc" class="control" placeholder="Descrição (opcional)"></div>
           <div class="field"><textarea id="tutorial-content" class="control" placeholder="Digite o passo a passo do tutorial..."></textarea></div>
+          <div class="field"><label style="font-size:12px;color:var(--muted);font-weight:600">Anexo opcional</label><input type="file" id="tutorial-file" class="control"></div>
           <button class="btn btn-primary" style="width:100%" onclick="saveTutorial()"><svg class="icon"><use href="#i-plus"></use></svg><span id="tutorial-save-label">Adicionar tutorial</span></button>
           <button id="tutorial-cancel" class="btn btn-secondary" style="width:100%;margin-top:10px;display:none" onclick="cancelTutorialEdit()">Cancelar edição</button>
         </div>
         <div class="card library">
-          <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:18px"><div><h2>Biblioteca <span class="muted" id="tutorial-count">(0)</span></h2><p class="muted">Tudo salvo fica aqui para visualizar e copiar.</p></div></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:18px"><div><h2>Biblioteca <span class="muted" id="tutorial-count">(0)</span></h2><p class="muted">Tutoriais salvos para consultar rápido.</p></div></div>
           <div class="search-row"><div class="search"><svg class="icon"><use href="#i-search"></use></svg><input id="search-tutoriais" oninput="renderTutoriais()" placeholder="Pesquisar tutoriais..."></div><select id="filter-tutorial" class="control select-small" onchange="renderTutoriais()"><option value="">Todos</option><option value="texto">Texto</option><option value="link">Link</option><option value="video">Vídeo</option></select></div>
           <div id="tutoriais-container" class="grid"></div>
         </div>
@@ -183,7 +295,12 @@
   <div class="modal" id="modal-task"><div class="modal-box"><div class="modal-head"><h2 id="task-modal-title">Nova tarefa</h2><button class="btn-ghost" onclick="closeModal('modal-task')"><svg class="icon"><use href="#i-x"></use></svg></button></div><input type="hidden" id="task-id"><div class="field"><label>Título</label><input id="task-title" class="control" placeholder="Ex: Conferir protocolo da Maria"></div><div class="field"><label>Descrição</label><textarea id="task-desc" class="control" placeholder="Detalhes da tarefa, cliente, protocolo, orientação..."></textarea></div><div class="field"><label>Data de vencimento</label><input id="task-date" type="date" class="control"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-task')">Cancelar</button><button class="btn btn-primary" onclick="saveTask()">Salvar tarefa</button></div></div></div>
   <div id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL = "https://tigmodhubpzfvqextzof.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_Mn3rEMECfW8mpoNpkuTpaw_VChHX49m";
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+let useSupabase = !!supabaseClient;
 const PORTAL_LINK='https://pm-contagem.sgpcloud.com.br/sgp/pse/tramitacao/pesquisa';
 const MSG_HEADER='MENSAGEM AUTOMÁTICA – ATENÇÃO';
 const MSG_FOOTER='Não possuímos vínculo com o órgão responsável e não nos responsabilizamos por prazos, perdas ou quaisquer desdobramentos da solicitação.';
@@ -205,13 +322,14 @@ const defaults={
     {id:'t2',type:'link',title:'Portal de consulta',desc:'Link fixo para acompanhamento.',content:PORTAL_LINK}
   ],
   notes:[],
+  anexos:[],
   tasks:[
     {id:'demo-vencida',title:'Demonstração de tarefa vencida',desc:'Esta tarefa venceu ontem. Ela começa como pendente e o sistema move sozinho para Vencidas.',date:new Date(Date.now()-86400000).toISOString().split('T')[0],status:'pendente'}
   ]
 };
 function get(k){return JSON.parse(localStorage.getItem('af_'+k+'_v9')||JSON.stringify(defaults[k]||[]))}
 function set(k,v){localStorage.setItem('af_'+k+'_v9',JSON.stringify(v))}
-let data={duvidas:get('duvidas'),ready:get('ready'),tutoriais:get('tutoriais'),notes:get('notes'),tasks:get('tasks')};
+let data={duvidas:get('duvidas'),ready:get('ready'),tutoriais:get('tutoriais'),notes:get('notes'),anexos:get('anexos'),tasks:get('tasks')};
 function svg(id){return `<svg class="icon"><use href="#${id}"></use></svg>`}
 function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.getElementById('toast').appendChild(t);setTimeout(()=>t.remove(),2600)}
 function esc(s=''){return String(s).replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
@@ -221,10 +339,81 @@ function switchTab(id,el){document.querySelectorAll('.tab').forEach(t=>t.classLi
 function openModal(id){document.getElementById(id).classList.add('active')} function closeModal(id){document.getElementById(id).classList.remove('active')}
 function addDays(n){let d=new Date();d.setDate(d.getDate()+n);return d.toLocaleDateString('pt-BR')}
 
+function isUuid(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(v||''))}
+function saveLocalAll(){set('duvidas',data.duvidas);set('ready',data.ready);set('tutoriais',data.tutoriais);set('notes',data.notes);set('tasks',data.tasks);set('anexos',data.anexos||[])}
+function fromDb(table,row){
+  if(table==='duvidas')return {id:row.id,title:row.titulo,type:row.tipo,subtype:row.subtipo,text:row.texto};
+  if(table==='ready')return {id:row.id,title:row.titulo,text:row.texto};
+  if(table==='tutoriais')return {id:row.id,type:row.tipo,title:row.titulo,desc:row.descricao||'',content:row.conteudo||row.link||''};
+  if(table==='tasks')return {id:row.id,title:row.titulo,desc:row.descricao||'',date:row.vencimento,status:row.status||'pendente'};
+  if(table==='notes')return {id:row.id,title:row.titulo||'',text:row.texto,date:row.criado_em?new Date(row.criado_em).toLocaleDateString('pt-BR'):new Date().toLocaleDateString('pt-BR')};
+  if(table==='anexos')return {id:row.id,item_id:row.item_id,nome_arquivo:row.nome_arquivo,url_publica:row.url_publica,tipo_arquivo:row.tipo_arquivo,caminho_arquivo:row.caminho_arquivo};
+}
+function toDb(table,obj){
+  if(table==='duvidas')return {titulo:obj.title,tipo:obj.type,subtipo:obj.subtype,texto:obj.text};
+  if(table==='ready')return {titulo:obj.title,texto:obj.text};
+  if(table==='tutoriais')return {titulo:obj.title,tipo:obj.type,descricao:obj.desc||'',conteudo:obj.type==='texto'?obj.content:'',link:obj.type!=='texto'?obj.content:''};
+  if(table==='tasks')return {titulo:obj.title,descricao:obj.desc||'',vencimento:obj.date||null,status:obj.status||'pendente'};
+  if(table==='notes')return {titulo:obj.title||'',texto:obj.text};
+}
+async function loadFromSupabase(){
+  if(!useSupabase)return;
+  try{
+    const [duvidas,ready,tutoriais,notes,tasks,anexos]=await Promise.all([
+      supabaseClient.from('duvidas').select('*').order('criado_em',{ascending:false}),
+      supabaseClient.from('mensagens_prontas').select('*').order('criado_em',{ascending:false}),
+      supabaseClient.from('tutoriais').select('*').order('criado_em',{ascending:false}),
+      supabaseClient.from('anotacoes').select('*').order('criado_em',{ascending:false}),
+      supabaseClient.from('tarefas').select('*').order('criado_em',{ascending:false}),
+      supabaseClient.from('anexos').select('*').order('criado_em',{ascending:false})
+    ]);
+    const results=[duvidas,ready,tutoriais,notes,tasks,anexos];
+    if(results.some(r=>r.error)){console.error(results.map(r=>r.error).filter(Boolean));toast('Não consegui carregar tudo do Supabase. Usando dados locais.');return;}
+    if(duvidas.data.length)data.duvidas=duvidas.data.map(r=>fromDb('duvidas',r));
+    if(ready.data.length)data.ready=ready.data.map(r=>fromDb('ready',r));
+    if(tutoriais.data.length)data.tutoriais=tutoriais.data.map(r=>fromDb('tutoriais',r));
+    if(notes.data.length)data.notes=notes.data.map(r=>fromDb('notes',r));
+    if(tasks.data.length)data.tasks=tasks.data.map(r=>fromDb('tasks',r));
+    data.anexos=anexos.data.map(r=>fromDb('anexos',r));
+    saveLocalAll();renderDuvidas();renderReady();renderTutoriais();renderNotes();renderTasks();toast('Dados carregados do Supabase!');
+  }catch(e){console.error(e);toast('Falha ao conectar no Supabase. Usando dados locais.');}
+}
+async function saveCloud(table,obj){
+  if(!useSupabase)return obj;
+  const tableMap={duvidas:'duvidas',ready:'mensagens_prontas',tutoriais:'tutoriais',tasks:'tarefas',notes:'anotacoes'};
+  const db=toDb(table,obj);let res;
+  if(obj.id&&isUuid(obj.id))res=await supabaseClient.from(tableMap[table]).update(db).eq('id',obj.id).select().single();
+  else res=await supabaseClient.from(tableMap[table]).insert(db).select().single();
+  if(res.error){console.error(res.error);toast('Erro ao salvar no Supabase. Salvei localmente.');return obj;}
+  return fromDb(table,res.data);
+}
+async function deleteCloud(table,id){
+  if(!useSupabase||!isUuid(id))return true;
+  const tableMap={duvidas:'duvidas',ready:'mensagens_prontas',tutoriais:'tutoriais',tasks:'tarefas',notes:'anotacoes'};
+  const res=await supabaseClient.from(tableMap[table]).delete().eq('id',id);
+  if(res.error){console.error(res.error);toast('Erro ao excluir no Supabase.');return false;}
+  return true;
+}
+function attachmentsFor(itemId){return (data.anexos||[]).filter(a=>a.item_id===itemId)}
+async function uploadTutorialFile(itemId){
+  const input=document.getElementById('tutorial-file');
+  const file=input?.files?.[0];
+  if(!file||!useSupabase||!isUuid(itemId))return;
+  const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  const path=`tutoriais/${itemId}/${Date.now()}-${safeName}`;
+  const up=await supabaseClient.storage.from('anexos').upload(path,file,{upsert:false});
+  if(up.error){console.error(up.error);toast('Tutorial salvo, mas o anexo não subiu.');return;}
+  const publicData=supabaseClient.storage.from('anexos').getPublicUrl(path);
+  const url=publicData.data.publicUrl;
+  const reg=await supabaseClient.from('anexos').insert({tabela_origem:'tutoriais',item_id:itemId,nome_arquivo:file.name,caminho_arquivo:path,url_publica:url,tipo_arquivo:file.type}).select().single();
+  if(reg.error){console.error(reg.error);toast('Anexo enviado, mas não registrou no banco.');return;}
+  data.anexos.unshift(fromDb('anexos',reg.data));set('anexos',data.anexos);input.value='';toast('Anexo salvo!');
+}
+
 function renderDuvidas(){const q=(document.getElementById('search-duvidas').value||'').toLowerCase(),tp=document.getElementById('filter-tipo').value,st=document.getElementById('filter-subtipo').value;const arr=data.duvidas.filter(d=>(!tp||d.type===tp)&&(!st||d.subtype===st)&&(d.title.toLowerCase().includes(q)||d.text.toLowerCase().includes(q)));document.getElementById('duvidas-container').innerHTML=arr.length?arr.map(d=>`<div class="card item-card"><div><span class="badge badge-blue">${esc(d.type)}</span> <span class="badge badge-gray">${esc(d.subtype)}</span></div><h3>${esc(d.title)}</h3><p>${esc(d.text)}</p><div class="item-footer"><div class="actions"><button class="btn btn-ghost" onclick="editDuvida('${d.id}')">${svg('i-edit')}</button><button class="btn btn-ghost" style="color:var(--danger)" onclick="del('duvidas','${d.id}')">${svg('i-trash')}</button></div><button class="btn btn-primary" onclick="copy(\`${js(d.text)}\`)">${svg('i-copy')}Copiar</button></div></div>`).join(''):'<div class="card muted">Nenhuma dúvida encontrada.</div>'}
 function openDuvida(){['duvida-id','duvida-title','duvida-text'].forEach(id=>document.getElementById(id).value='');document.getElementById('duvida-modal-title').textContent='Adicionar dúvida';openModal('modal-duvida')}
 function editDuvida(id){const d=data.duvidas.find(x=>x.id===id);if(!d)return;document.getElementById('duvida-id').value=d.id;document.getElementById('duvida-title').value=d.title;document.getElementById('duvida-type').value=d.type;document.getElementById('duvida-subtype').value=d.subtype;document.getElementById('duvida-text').value=d.text;document.getElementById('duvida-modal-title').textContent='Editar dúvida';openModal('modal-duvida')}
-function saveDuvida(){const id=document.getElementById('duvida-id').value||Date.now().toString();const obj={id,title:document.getElementById('duvida-title').value,type:document.getElementById('duvida-type').value,subtype:document.getElementById('duvida-subtype').value,text:document.getElementById('duvida-text').value};if(!obj.title||!obj.text)return toast('Preencha título e mensagem.');const i=data.duvidas.findIndex(x=>x.id===id);i>=0?data.duvidas[i]=obj:data.duvidas.unshift(obj);set('duvidas',data.duvidas);closeModal('modal-duvida');renderDuvidas();toast('Salvo!')}
+async function saveDuvida(){const id=document.getElementById('duvida-id').value||'';let obj={id,title:document.getElementById('duvida-title').value,type:document.getElementById('duvida-type').value,subtype:document.getElementById('duvida-subtype').value,text:document.getElementById('duvida-text').value};if(!obj.title||!obj.text)return toast('Preencha título e mensagem.');obj=await saveCloud('duvidas',obj);const i=data.duvidas.findIndex(x=>x.id===id||x.id===obj.id);i>=0?data.duvidas[i]=obj:data.duvidas.unshift(obj);set('duvidas',data.duvidas);closeModal('modal-duvida');renderDuvidas();toast('Salvo!')}
 
 function handleGeneratorType(){let t=document.getElementById('gen-tipo').value;document.getElementById('gen-resposta-group').style.display=t==='protocolo'?'block':'none';document.getElementById('gen-bloqueio-group').style.display=t==='bloqueio'?'block':'none';if(t!=='protocolo')document.getElementById('gen-resposta').value='';if(t!=='bloqueio')document.getElementById('gen-bloqueio').value='';generateMessage()}
 function generateMessage(){const nome=document.getElementById('gen-nome').value||'[Nome do cliente]',tipo=document.getElementById('gen-tipo').value,obs=document.getElementById('gen-obs').value.trim();let txt='';if(!tipo){document.getElementById('message-preview').value='';return}txt=`${MSG_HEADER}\n\nOlá, ${nome}!\n\n`;if(tipo==='protocolo'){let r=document.getElementById('gen-resposta').value;if(!r){document.getElementById('message-preview').value='Selecione o tipo de resposta do órgão.';return}if(r==='incorreta')txt+='Recebemos uma atualização do órgão: a documentação enviada foi considerada incorreta ou ilegível.\n\nRecomendamos reenviar os documentos corretos o quanto antes.\n';if(r==='fora_prazo')txt+='Recebemos uma atualização do órgão: a solicitação consta como enviada fora do prazo.\n\nOriente-se pelo retorno oficial do órgão e acompanhe o protocolo.\n';if(r==='respondida')txt+='Sua solicitação foi respondida pelo órgão competente.\n\nO protocolo/resposta está em anexo ou disponível para consulta.\n';txt+=`\nPortal de consulta: ${PORTAL_LINK}`}
@@ -238,17 +427,41 @@ function copyPreview(){const v=document.getElementById('message-preview').value;
 function renderReady(){const q=(document.getElementById('search-ready').value||'').toLowerCase();const arr=data.ready.filter(r=>r.title.toLowerCase().includes(q)||r.text.toLowerCase().includes(q));document.getElementById('ready-container').innerHTML=arr.length?arr.map(r=>`<div class="card item-card"><span class="badge badge-blue">Mensagem pronta</span><h3>${esc(r.title)}</h3><p>${esc(r.text)}</p><div class="item-footer"><div class="actions"><button class="btn btn-ghost" onclick="editReady('${r.id}')">${svg('i-edit')}</button><button class="btn btn-ghost" style="color:var(--danger)" onclick="del('ready','${r.id}')">${svg('i-trash')}</button></div><button class="btn btn-primary" onclick="copy(\`${js(r.text)}\`)">${svg('i-copy')}Copiar</button></div></div>`).join(''):'<div class="card muted">Nenhuma mensagem pronta cadastrada.</div>'}
 function openReady(){document.getElementById('ready-id').value='';document.getElementById('ready-title').value='';document.getElementById('ready-text').value='';document.getElementById('ready-modal-title').textContent='Adicionar mensagem pronta';openModal('modal-ready')}
 function editReady(id){const r=data.ready.find(x=>x.id===id);if(!r)return;document.getElementById('ready-id').value=r.id;document.getElementById('ready-title').value=r.title;document.getElementById('ready-text').value=r.text;document.getElementById('ready-modal-title').textContent='Editar mensagem pronta';openModal('modal-ready')}
-function saveReady(){const id=document.getElementById('ready-id').value||Date.now().toString();const obj={id,title:document.getElementById('ready-title').value,text:document.getElementById('ready-text').value};if(!obj.title||!obj.text)return toast('Preencha título e mensagem.');const i=data.ready.findIndex(x=>x.id===id);i>=0?data.ready[i]=obj:data.ready.unshift(obj);set('ready',data.ready);closeModal('modal-ready');renderReady();toast('Mensagem salva!')}
+async function saveReady(){const id=document.getElementById('ready-id').value||'';let obj={id,title:document.getElementById('ready-title').value,text:document.getElementById('ready-text').value};if(!obj.title||!obj.text)return toast('Preencha título e mensagem.');obj=await saveCloud('ready',obj);const i=data.ready.findIndex(x=>x.id===id||x.id===obj.id);i>=0?data.ready[i]=obj:data.ready.unshift(obj);set('ready',data.ready);closeModal('modal-ready');renderReady();toast('Mensagem salva!')}
 
 function setTutorialType(type){document.getElementById('tutorial-type').value=type;['texto','link','video'].forEach(t=>document.getElementById('seg-'+t).classList.toggle('active',t===type));const c=document.getElementById('tutorial-content');if(type==='texto'){c.placeholder='Digite o passo a passo do tutorial...';c.rows=7}else if(type==='link'){c.placeholder='https://... (YouTube, PDF, página)';c.rows=4}else{c.placeholder='Cole o link do vídeo (YouTube, Drive, Loom etc.)';c.rows=4}}
-function saveTutorial(){const id=document.getElementById('tutorial-id').value||Date.now().toString();const obj={id,type:document.getElementById('tutorial-type').value,title:document.getElementById('tutorial-title').value,desc:document.getElementById('tutorial-desc').value,content:document.getElementById('tutorial-content').value};if(!obj.title||!obj.content)return toast('Preencha título e conteúdo/link.');const i=data.tutoriais.findIndex(x=>x.id===id);i>=0?data.tutoriais[i]=obj:data.tutoriais.unshift(obj);set('tutoriais',data.tutoriais);clearTutorialForm();renderTutoriais();toast('Tutorial salvo!')}
-function clearTutorialForm(){document.getElementById('tutorial-id').value='';document.getElementById('tutorial-title').value='';document.getElementById('tutorial-desc').value='';document.getElementById('tutorial-content').value='';document.getElementById('tutorial-save-label').textContent='Adicionar tutorial';document.getElementById('tutorial-cancel').style.display='none';setTutorialType('texto')}
+async function saveTutorial(){const id=document.getElementById('tutorial-id').value||'';let obj={id,type:document.getElementById('tutorial-type').value,title:document.getElementById('tutorial-title').value,desc:document.getElementById('tutorial-desc').value,content:document.getElementById('tutorial-content').value};if(!obj.title||!obj.content)return toast('Preencha título e conteúdo/link.');obj=await saveCloud('tutoriais',obj);const i=data.tutoriais.findIndex(x=>x.id===id||x.id===obj.id);i>=0?data.tutoriais[i]=obj:data.tutoriais.unshift(obj);set('tutoriais',data.tutoriais);await uploadTutorialFile(obj.id);clearTutorialForm();renderTutoriais();toast('Tutorial salvo!')}
+function clearTutorialForm(){document.getElementById('tutorial-id').value='';document.getElementById('tutorial-title').value='';document.getElementById('tutorial-desc').value='';document.getElementById('tutorial-content').value='';if(document.getElementById('tutorial-file'))document.getElementById('tutorial-file').value='';document.getElementById('tutorial-save-label').textContent='Adicionar tutorial';document.getElementById('tutorial-cancel').style.display='none';setTutorialType('texto')}
 function cancelTutorialEdit(){clearTutorialForm()}
-function renderTutoriais(){const q=(document.getElementById('search-tutoriais').value||'').toLowerCase(),f=document.getElementById('filter-tutorial').value;const arr=data.tutoriais.filter(t=>(!f||t.type===f)&&(t.title.toLowerCase().includes(q)||(t.desc||'').toLowerCase().includes(q)||t.content.toLowerCase().includes(q)));document.getElementById('tutorial-count').textContent=`(${data.tutoriais.length})`;document.getElementById('tutoriais-container').innerHTML=arr.length?arr.map(t=>{const badge=t.type==='texto'?'badge-green':t.type==='video'?'badge-orange':'badge-blue';const body=t.type==='texto'?`<div class="tutorial-body">${esc(t.content)}</div>`:`<div class="video-box">${t.type==='video'?svg('i-video'):svg('i-link')} ${esc(t.content)}</div>`;return `<div class="tutorial-card"><div><span class="badge ${badge}">${esc(t.type)}</span><h3 style="margin-top:10px">${esc(t.title)}</h3>${t.desc?`<p class="desc muted">${esc(t.desc)}</p>`:''}</div>${body}<div class="actions"><button class="btn btn-secondary" onclick="viewTutorial('${t.id}')">${svg('i-eye')}Visualizar</button><button class="btn btn-secondary" onclick="editTutorial('${t.id}')">${svg('i-edit')}Editar</button>${t.type==='texto'?`<button class="btn btn-secondary" onclick="copy(\`${js(t.content)}\`)">${svg('i-copy')}Copiar</button>`:`<a class="btn btn-secondary" href="${esc(t.content)}" target="_blank">${svg('i-link')}Abrir</a>`}<button class="btn btn-danger" onclick="del('tutoriais','${t.id}')">${svg('i-trash')}Excluir</button></div></div>`}).join(''):'<div class="library-empty"><div>Nenhum tutorial ainda. Adicione textos, links ou vídeos.</div></div>'}
+function renderTutoriais(){
+  const q=(document.getElementById('search-tutoriais').value||'').toLowerCase(),f=document.getElementById('filter-tutorial').value;
+  const arr=data.tutoriais.filter(t=>(!f||t.type===f)&&(t.title.toLowerCase().includes(q)||(t.desc||'').toLowerCase().includes(q)||t.content.toLowerCase().includes(q)));
+  document.getElementById('tutorial-count').textContent=`(${data.tutoriais.length})`;
+  const html=arr.length?`<div class="tutorial-list">${arr.map(t=>{
+    const badge=t.type==='texto'?'badge-green':t.type==='video'?'badge-orange':'badge-blue';
+    const preview=t.type==='texto'?t.content:t.content;
+    return `<div class="tutorial-row">
+      <div style="min-width:0">
+        <span class="badge ${badge}">${esc(t.type)}</span>
+        <h3>${esc(t.title)}</h3>
+        ${t.desc?`<p class="desc">${esc(t.desc)}</p>`:''}
+        <div class="tutorial-preview">${esc(preview)}</div>
+        ${attachmentsFor(t.id).length?`<div class="tutorial-preview" style="margin-top:8px"><strong>Anexos:</strong> ${attachmentsFor(t.id).map(a=>`<a href="${esc(a.url_publica)}" target="_blank">${esc(a.nome_arquivo)}</a>`).join(' · ')}</div>`:''}
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="viewTutorial('${t.id}')">${svg('i-eye')}Ver</button>
+        <button class="btn btn-secondary" onclick="editTutorial('${t.id}')">${svg('i-edit')}Editar</button>
+        ${t.type==='texto'?`<button class="btn btn-secondary" onclick="copy(\`${js(t.content)}\`)">${svg('i-copy')}Copiar</button>`:`<a class="btn btn-secondary" href="${esc(t.content)}" target="_blank">${svg('i-link')}Abrir</a>`}
+        <button class="btn btn-danger" onclick="del('tutoriais','${t.id}')">${svg('i-trash')}</button>
+      </div>
+    </div>`
+  }).join('')}</div>`:'<div class="library-empty"><div>Nenhum tutorial ainda. Adicione textos, links ou vídeos.</div></div>';
+  document.getElementById('tutoriais-container').innerHTML=html;
+}
 function viewTutorial(id){const t=data.tutoriais.find(x=>x.id===id);if(!t)return;document.getElementById('view-title').textContent=t.title;document.getElementById('view-content').innerHTML=`<span class="badge badge-blue">${esc(t.type)}</span>${t.desc?`<p style="margin:12px 0;color:var(--ink)">${esc(t.desc)}</p>`:''}<div style="margin-top:14px;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap">${esc(t.content)}</div>`;document.getElementById('view-actions').innerHTML=t.type==='texto'?`<button class="btn btn-primary" onclick="copy(\`${js(t.content)}\`)">${svg('i-copy')}Copiar</button>`:`<a class="btn btn-primary" href="${esc(t.content)}" target="_blank">${svg('i-link')}Abrir link</a>`;openModal('modal-view')}
 function editTutorial(id){const t=data.tutoriais.find(x=>x.id===id);if(!t)return;document.getElementById('tutorial-id').value=t.id;setTutorialType(t.type);document.getElementById('tutorial-title').value=t.title;document.getElementById('tutorial-desc').value=t.desc||'';document.getElementById('tutorial-content').value=t.content;document.getElementById('tutorial-save-label').textContent='Salvar alteração';document.getElementById('tutorial-cancel').style.display='inline-flex';window.scrollTo({top:0,behavior:'smooth'})}
 
-function openNote(){document.getElementById('note-text').value='';openModal('modal-note')}function saveNote(){const text=document.getElementById('note-text').value;if(!text)return;data.notes.unshift({id:Date.now().toString(),text,date:new Date().toLocaleDateString('pt-BR')});set('notes',data.notes);closeModal('modal-note');renderNotes();toast('Anotação salva!')}function renderNotes(){const q=(document.getElementById('search-notes')?.value||'').toLowerCase();const arr=data.notes.filter(n=>n.text.toLowerCase().includes(q));document.getElementById('notes-container').innerHTML=arr.length?arr.map(n=>`<div class="card item-card"><span class="badge badge-gray">${n.date}</span><p>${esc(n.text)}</p><div class="item-footer"><button class="btn btn-danger" onclick="del('notes','${n.id}')">Excluir</button></div></div>`).join(''):'<div class="card muted">Nenhuma anotação.</div>'}
+function openNote(){document.getElementById('note-text').value='';openModal('modal-note')}async function saveNote(){const text=document.getElementById('note-text').value;if(!text)return;let obj={id:'',text,date:new Date().toLocaleDateString('pt-BR')};obj=await saveCloud('notes',obj);data.notes.unshift(obj);set('notes',data.notes);closeModal('modal-note');renderNotes();toast('Anotação salva!')}function renderNotes(){const q=(document.getElementById('search-notes')?.value||'').toLowerCase();const arr=data.notes.filter(n=>n.text.toLowerCase().includes(q));document.getElementById('notes-container').innerHTML=arr.length?arr.map(n=>`<div class="card item-card"><span class="badge badge-gray">${n.date}</span><p>${esc(n.text)}</p><div class="item-footer"><button class="btn btn-danger" onclick="del('notes','${n.id}')">Excluir</button></div></div>`).join(''):'<div class="card muted">Nenhuma anotação.</div>'}
 function normalizeTasks(){
   const today=new Date().toISOString().split('T')[0];
   let changed=false;
@@ -278,18 +491,19 @@ function editTask(id){
   document.getElementById('task-modal-title').textContent='Editar tarefa';
   openModal('modal-task');
 }
-function saveTask(){
-  const id=document.getElementById('task-id').value||Date.now().toString();
+async function saveTask(){
+  const id=document.getElementById('task-id').value||'';
   const title=document.getElementById('task-title').value.trim();
   const desc=document.getElementById('task-desc').value.trim();
   const date=document.getElementById('task-date').value;
   if(!title)return toast('Preencha o título da tarefa.');
   if(!date)return toast('Informe a data de vencimento.');
   const existing=data.tasks.find(x=>x.id===id);
-  const obj={id,title,desc,date,status:existing?existing.status:'pendente'};
+  let obj={id,title,desc,date,status:existing?existing.status:'pendente'};
   const today=new Date().toISOString().split('T')[0];
   if(obj.status==='pendente'&&obj.date<today)obj.status='vencida';
-  const i=data.tasks.findIndex(x=>x.id===id);
+  obj=await saveCloud('tasks',obj);
+  const i=data.tasks.findIndex(x=>x.id===id||x.id===obj.id);
   i>=0?data.tasks[i]=obj:data.tasks.unshift(obj);
   set('tasks',data.tasks);closeModal('modal-task');renderTasks();toast('Tarefa salva!');
 }
@@ -307,7 +521,7 @@ function renderTasks(){
     div.ondragstart=dragTask;
     div.ondragend=endDragTask;
     const dataFormatada=t.date?new Date(t.date+'T00:00:00').toLocaleDateString('pt-BR'):'Sem data';
-    div.innerHTML=`<div class="task-title">${esc(t.title)}</div><span class="task-status ${status==='vencida'?'overdue-label':status==='feita'?'done-label':''}">${status==='vencida'?'Vencida':status==='feita'?'Feita':'Pendente'}</span>${t.desc?`<div class="task-desc">${esc(t.desc)}</div>`:''}<div class="task-date">Vencimento: ${dataFormatada}</div><div class="actions"><button class="btn btn-secondary" onclick="editTask('${t.id}')">Editar</button>${status!=='feita'?`<button class="btn btn-secondary" onclick="taskStatus('${t.id}','feita')">Marcar como feito</button>`:''}<button class="btn btn-danger" onclick="del('tasks','${t.id}')">Excluir</button></div>`;
+    div.innerHTML=`<div class="task-title">${esc(t.title)}</div><span class="task-status ${status==='vencida'?'overdue-label':status==='feita'?'done-label':''}">${status==='vencida'?'Vencida':status==='feita'?'Feita':'Pendente'}</span>${t.desc?`<div class="task-desc">${esc(t.desc)}</div>`:''}<div class="task-date">Vencimento: ${dataFormatada}</div><div class="actions"><button class="btn btn-secondary" onclick="editTask('${t.id}')">Editar</button>${status!=='feita'?`<button class="btn btn-secondary" onclick="taskStatus('${t.id}','feita')">Feito</button>`:''}<button class="btn btn-danger" onclick="del('tasks','${t.id}')">Excluir</button></div><div class="mobile-move"><button class="${status==='pendente'?'active':''}" onclick="taskStatus('${t.id}','pendente')">Pendente</button><button class="${status==='feita'?'active':''}" onclick="taskStatus('${t.id}','feita')">Feita</button><button class="${status==='vencida'?'active':''}" onclick="taskStatus('${t.id}','vencida')">Vencida</button></div>`;
     document.getElementById('tasks-'+status).appendChild(div);
   });
   ['pendente','feita','vencida'].forEach(s=>{
@@ -324,7 +538,7 @@ function dragTask(ev){
 function endDragTask(ev){ev.currentTarget.classList.remove('dragging');document.querySelectorAll('.kan-drop').forEach(c=>c.classList.remove('drag-over'))}
 function allowTaskDrop(ev){ev.preventDefault();ev.currentTarget.classList.add('drag-over')}
 function leaveTaskDrop(ev){ev.currentTarget.classList.remove('drag-over')}
-function dropTask(ev){
+async function dropTask(ev){
   ev.preventDefault();
   const id=ev.dataTransfer.getData('text/plain');
   const status=ev.currentTarget.dataset.status;
@@ -332,12 +546,13 @@ function dropTask(ev){
   if(!t)return;
   t.status=status;
   if(status==='pendente'&&t.date&&t.date<new Date().toISOString().split('T')[0])t.status='vencida';
-  set('tasks',data.tasks);renderTasks();
+  await saveCloud('tasks',t);set('tasks',data.tasks);renderTasks();
 }
-function taskStatus(id,st){const t=data.tasks.find(x=>x.id===id);if(t){t.status=st;set('tasks',data.tasks);renderTasks();}}
-function del(key,id){if(!confirm('Excluir este item?'))return;data[key]=data[key].filter(x=>x.id!==id);set(key,data[key]);renderDuvidas();renderReady();renderTutoriais();renderNotes();renderTasks();toast('Excluído!')}
+async function taskStatus(id,st){const t=data.tasks.find(x=>x.id===id);if(t){t.status=st;await saveCloud('tasks',t);set('tasks',data.tasks);renderTasks();}}
+async function del(key,id){if(!confirm('Excluir este item?'))return;const ok=await deleteCloud(key,id);if(!ok)return;data[key]=data[key].filter(x=>x.id!==id);set(key,data[key]);renderDuvidas();renderReady();renderTutoriais();renderNotes();renderTasks();toast('Excluído!')}
 
 renderDuvidas();renderReady();renderTutoriais();renderNotes();renderTasks();
+loadFromSupabase();
 setInterval(renderTasks,60000);
 </script>
 </body>
