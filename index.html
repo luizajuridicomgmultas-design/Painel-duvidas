@@ -283,6 +283,7 @@
 
     <section id="tab-tarefas" class="tab">
       <div class="page-head"><div><div class="eyebrow">Pendências</div><h1>Tarefas</h1><p>Kanban simples para não deixar retorno passar.</p></div><button class="btn btn-primary" onclick="openTask()"><svg class="icon"><use href="#i-plus"></use></svg>Nova tarefa</button></div>
+      <div class="task-demo"><svg class="icon"><use href="#i-check"></use></svg><span><strong>Demonstração:</strong> deixei uma tarefa de exemplo com vencimento de ontem. Ao abrir o portal, ela vai automaticamente para <strong>Vencidas</strong>. Se marcar como feita, ela sai de lá.</span></div>
       <div class="kanban"><div class="kan-col"><h3>Pendentes <span class="badge badge-gray" id="count-pendente">0</span></h3><div id="tasks-pendente" class="kan-drop" data-status="pendente" ondragover="allowTaskDrop(event)" ondragleave="leaveTaskDrop(event)" ondrop="dropTask(event)"></div></div><div class="kan-col"><h3>Feitas <span class="badge badge-gray" id="count-feita">0</span></h3><div id="tasks-feita" class="kan-drop" data-status="feita" ondragover="allowTaskDrop(event)" ondragleave="leaveTaskDrop(event)" ondrop="dropTask(event)"></div></div><div class="kan-col"><h3>Vencidas <span class="badge badge-gray" id="count-vencida">0</span></h3><div id="tasks-vencida" class="kan-drop" data-status="vencida" ondragover="allowTaskDrop(event)" ondragleave="leaveTaskDrop(event)" ondrop="dropTask(event)"></div></div></div>
     </section>
   </main>
@@ -303,19 +304,93 @@ let useSupabase = !!supabaseClient;
 const PORTAL_LINK='https://pm-contagem.sgpcloud.com.br/sgp/pse/tramitacao/pesquisa';
 const MSG_HEADER='MENSAGEM AUTOMÁTICA – ATENÇÃO';
 const MSG_FOOTER='Não possuímos vínculo com o órgão responsável e não nos responsabilizamos por prazos, perdas ou quaisquer desdobramentos da solicitação.';
+const defaultReadyTemplates = [
+  {
+    id:'r1',
+    title:'Horário de atendimento',
+    text:`Olá! Nosso horário de atendimento é de *segunda a sexta, das 09h às 18h*, e sábado, das *08h às 13h*.
+
+Assim que possível, retornaremos sua mensagem.`
+  },
+  {
+    id:'r2',
+    title:'Atualização do aplicativo',
+    text:`Olá, *[NOME]*.
+
+O aplicativo irá passar por uma atualização, e pode ser que os serviços fiquem fora do ar por até *4 horas*.
+
+Agradecemos a compreensão.`
+  },
+  {
+    id:'r3',
+    title:'Instabilidade temporária',
+    text:`Olá, *[NOME]*.
+
+No momento, o sistema pode estar passando por uma *instabilidade temporária*.
+
+Pedimos que aguarde alguns minutos e tente novamente.
+
+Caso continue com erro, nos envie um print da tela.`
+  },
+  {
+    id:'r4',
+    title:'Orientação para anexar documentos',
+    text:`Olá, *[NOME]*.
+
+Para anexar os documentos corretamente, envie arquivos ou fotos *legíveis, sem cortes e sem borrões*.
+
+Documentos ilegíveis podem prejudicar o envio ou a análise da solicitação.`
+  },
+  {
+    id:'r5',
+    title:'Aguardar retorno do órgão',
+    text:`Olá, *[NOME]*.
+
+Sua solicitação já foi enviada.
+
+Agora é necessário aguardar o retorno do órgão responsável pelo portal de consulta.
+
+Assim que houver atualização, você poderá acompanhar diretamente pelo protocolo.`
+  },
+  {
+    id:'r6',
+    title:'Solicitar print do erro',
+    text:`Pode me enviar um *print da tela* onde aparece o erro?
+
+Assim consigo verificar melhor o que está acontecendo e te orientar corretamente.`
+  },
+  {
+    id:'r7',
+    title:'Documento ilegível',
+    text:`O documento enviado está *ilegível ou com baixa qualidade*.
+
+Por favor, envie novamente uma foto mais nítida, sem cortes, sombras ou partes borradas.`
+  },
+  {
+    id:'r8',
+    title:'Confirmação de recebimento',
+    text:`Recebemos as informações enviadas.
+
+Vamos verificar e, se necessário, retornamos com novas orientações.`
+  },
+  {
+    id:'r9',
+    title:'Encerramento de atendimento',
+    text:`Certo, *[NOME]*.
+
+Qualquer nova dúvida, estamos à disposição.
+
+Tenha um ótimo dia!`
+  }
+];
+
 const defaults={
   duvidas:[
     {id:'d1',title:'Prazos e dias úteis',type:'Prazo',subtype:'Aplicativo',text:'O servidor deve solicitar a perícia em até 2 dias úteis após o início do afastamento.\n\nSábado, domingo e feriados não contam como dia útil para protocolo.\n\nAtenção: perder o prazo pode causar recusa do atestado e gerar falta.'},
     {id:'d2',title:'Documentação obrigatória',type:'Documentação',subtype:'Formulário',text:'Para solicitar a perícia, o servidor precisa enviar: formulário preenchido, documento de identidade, contracheque e atestado médico, quando houver.\n\nDocumentos ilegíveis, incompletos ou cortados podem causar recusa na análise.'},
     {id:'d3',title:'Responsabilidade do servidor',type:'Responsabilidade',subtype:'Aplicativo',text:'Depois do envio, é obrigação do cliente acompanhar o protocolo no portal do órgão.\n\nAs respostas oficiais são disponibilizadas pelo órgão competente, e não pelo aplicativo.'}
   ],
-  ready:[
-    {id:'r1',title:'Horário de atendimento',text:'Olá! Nosso horário de atendimento é de segunda a sexta, das 08h às 18h. Responderemos sua mensagem o mais breve possível dentro deste horário.'},
-    {id:'r2',title:'Atualização do aplicativo',text:'Temos uma nova atualização disponível. Para evitar falhas, recomendamos fechar e abrir o aplicativo novamente. Caso o problema continue, nos envie um print da tela.'},
-    {id:'r3',title:'Instabilidade',text:'Estamos passando por uma instabilidade temporária. Nossa equipe já está verificando. Assim que normalizar, avisaremos por aqui.'},
-    {id:'r4',title:'Anexar documentos',text:'Envie os documentos em imagem nítida ou PDF. Confira se o documento está completo, sem cortes, sem desfoque e com todas as informações visíveis.'},
-    {id:'r5',title:'Aguardar retorno do órgão',text:'Sua solicitação já foi encaminhada. Agora é necessário aguardar a análise do órgão competente e acompanhar o protocolo pelo portal oficial.'}
-  ],
+  ready:defaultReadyTemplates,
   tutoriais:[
     {id:'t1',type:'texto',title:'Como acompanhar protocolo',desc:'Passo a passo para orientar o cliente.',content:'1. Acesse o portal de consulta.\n2. Informe o número do protocolo.\n3. Confira se existe resposta do órgão.\n4. Caso tenha anexo ou exigência, envie para nossa equipe analisar.'},
     {id:'t2',type:'link',title:'Portal de consulta',desc:'Link fixo para acompanhamento.',content:PORTAL_LINK}
@@ -409,18 +484,75 @@ async function uploadTutorialFile(itemId){
   data.anexos.unshift(fromDb('anexos',reg.data));set('anexos',data.anexos);input.value='';toast('Anexo salvo!');
 }
 
+
+async function ensureDefaultReadyTemplates(){
+  let changed=false;
+  for(const msg of defaultReadyTemplates){
+    let existing=data.ready.find(r=>(r.title||'').toLowerCase()===msg.title.toLowerCase());
+    if(existing){
+      if(existing.text!==msg.text){existing.text=msg.text;changed=true;if(useSupabase&&isUuid(existing.id))await saveCloud('ready',existing)}
+    }else{
+      let obj={id:msg.id,title:msg.title,text:msg.text};
+      obj=await saveCloud('ready',obj);
+      data.ready.push(obj);
+      changed=true;
+    }
+  }
+  if(changed){set('ready',data.ready);renderReady();}
+}
+
 function renderDuvidas(){const q=(document.getElementById('search-duvidas').value||'').toLowerCase(),tp=document.getElementById('filter-tipo').value,st=document.getElementById('filter-subtipo').value;const arr=data.duvidas.filter(d=>(!tp||d.type===tp)&&(!st||d.subtype===st)&&(d.title.toLowerCase().includes(q)||d.text.toLowerCase().includes(q)));document.getElementById('duvidas-container').innerHTML=arr.length?arr.map(d=>`<div class="card item-card"><div><span class="badge badge-blue">${esc(d.type)}</span> <span class="badge badge-gray">${esc(d.subtype)}</span></div><h3>${esc(d.title)}</h3><p>${esc(d.text)}</p><div class="item-footer"><div class="actions"><button class="btn btn-ghost" onclick="editDuvida('${d.id}')">${svg('i-edit')}</button><button class="btn btn-ghost" style="color:var(--danger)" onclick="del('duvidas','${d.id}')">${svg('i-trash')}</button></div><button class="btn btn-primary" onclick="copy(\`${js(d.text)}\`)">${svg('i-copy')}Copiar</button></div></div>`).join(''):'<div class="card muted">Nenhuma dúvida encontrada.</div>'}
 function openDuvida(){['duvida-id','duvida-title','duvida-text'].forEach(id=>document.getElementById(id).value='');document.getElementById('duvida-modal-title').textContent='Adicionar dúvida';openModal('modal-duvida')}
 function editDuvida(id){const d=data.duvidas.find(x=>x.id===id);if(!d)return;document.getElementById('duvida-id').value=d.id;document.getElementById('duvida-title').value=d.title;document.getElementById('duvida-type').value=d.type;document.getElementById('duvida-subtype').value=d.subtype;document.getElementById('duvida-text').value=d.text;document.getElementById('duvida-modal-title').textContent='Editar dúvida';openModal('modal-duvida')}
 async function saveDuvida(){const id=document.getElementById('duvida-id').value||'';let obj={id,title:document.getElementById('duvida-title').value,type:document.getElementById('duvida-type').value,subtype:document.getElementById('duvida-subtype').value,text:document.getElementById('duvida-text').value};if(!obj.title||!obj.text)return toast('Preencha título e mensagem.');obj=await saveCloud('duvidas',obj);const i=data.duvidas.findIndex(x=>x.id===id||x.id===obj.id);i>=0?data.duvidas[i]=obj:data.duvidas.unshift(obj);set('duvidas',data.duvidas);closeModal('modal-duvida');renderDuvidas();toast('Salvo!')}
 
 function handleGeneratorType(){let t=document.getElementById('gen-tipo').value;document.getElementById('gen-resposta-group').style.display=t==='protocolo'?'block':'none';document.getElementById('gen-bloqueio-group').style.display=t==='bloqueio'?'block':'none';if(t!=='protocolo')document.getElementById('gen-resposta').value='';if(t!=='bloqueio')document.getElementById('gen-bloqueio').value='';generateMessage()}
-function generateMessage(){const nome=document.getElementById('gen-nome').value||'[Nome do cliente]',tipo=document.getElementById('gen-tipo').value,obs=document.getElementById('gen-obs').value.trim();let txt='';if(!tipo){document.getElementById('message-preview').value='';return}txt=`${MSG_HEADER}\n\nOlá, ${nome}!\n\n`;if(tipo==='protocolo'){let r=document.getElementById('gen-resposta').value;if(!r){document.getElementById('message-preview').value='Selecione o tipo de resposta do órgão.';return}if(r==='incorreta')txt+='Recebemos uma atualização do órgão: a documentação enviada foi considerada incorreta ou ilegível.\n\nRecomendamos reenviar os documentos corretos o quanto antes.\n';if(r==='fora_prazo')txt+='Recebemos uma atualização do órgão: a solicitação consta como enviada fora do prazo.\n\nOriente-se pelo retorno oficial do órgão e acompanhe o protocolo.\n';if(r==='respondida')txt+='Sua solicitação foi respondida pelo órgão competente.\n\nO protocolo/resposta está em anexo ou disponível para consulta.\n';txt+=`\nPortal de consulta: ${PORTAL_LINK}`}
-if(tipo==='vencimento')txt+=`Seu prazo/acesso está previsto para vencer em ${addDays(3)}.\n\nPara evitar bloqueio ou perda de acesso, recomendamos regularizar antes dessa data.`;
-if(tipo==='bloqueio'){let b=document.getElementById('gen-bloqueio').value;if(!b){document.getElementById('message-preview').value='Selecione o motivo do bloqueio.';return}const map={pagamento:'falta de pagamento',nao_renovacao:'não renovação',indisciplina:'indisciplina'};txt+=`Informamos que o acesso foi bloqueado temporariamente.\n\nMotivo: ${map[b]}.\n\nPara regularizar, entre em contato com nossa equipe.`}
-if(tipo==='renovacao')txt+=`Sua renovação foi registrada com sucesso.\n\nA validade do acesso é de 90 dias. A próxima renovação está prevista para ${addDays(90)}.`;
-if(tipo==='alteracao')txt+='Houve uma alteração/atualização relacionada ao seu cadastro, solicitação ou aplicativo.\n\nConfira as informações atualizadas e, se necessário, nos envie uma mensagem para orientação.';
-if(obs)txt+=`\n\nObservação: ${obs}`;txt+=`\n\nAVISO FINAL: ${MSG_FOOTER}\n\nEm caso de dúvidas, estamos à disposição.`;document.getElementById('message-preview').value=txt}
+function hojeFormatado(){return new Date().toLocaleDateString('pt-BR')}
+function applyObs(txt,obs){return obs ? txt.replace('[OBSERVAÇÃO EXTRA]', obs) : txt.replace('\n\n*[OBSERVAÇÃO EXTRA]*','').replace('\n\n[OBSERVAÇÃO EXTRA]','')}
+function generateMessage(){
+  const nome=(document.getElementById('gen-nome').value||'[NOME]').trim();
+  const tipo=document.getElementById('gen-tipo').value;
+  const obs=document.getElementById('gen-obs').value.trim();
+  const dataHoje=hojeFormatado();
+  let txt='';
+  if(!tipo){document.getElementById('message-preview').value='';return}
+
+  if(tipo==='protocolo'){
+    const r=document.getElementById('gen-resposta').value;
+    if(!r){document.getElementById('message-preview').value='Selecione o tipo de resposta do órgão.';return}
+    if(r==='respondida'){
+      txt=`🚨 *MENSAGEM AUTOMÁTICA*\n\n*${nome}*, sua solicitação de perícia médica realizada em *${dataHoje}* foi enviada e cadastrada pelo órgão competente:\n\n📄 *Protocolo em anexo.*\n\nVocê pode acompanhar pelo portal:\n${PORTAL_LINK}\n\n⚠️ *Importante:* não temos vínculo com o órgão responsável e *não nos responsabilizamos por prazos, perdas ou desdobramentos da solicitação.*\n\nEm caso de dúvidas, estamos à disposição.`;
+    }
+    if(r==='fora_prazo'){
+      txt=`🚨 *MENSAGEM AUTOMÁTICA*\n\n*${nome}*, sua solicitação de perícia médica realizada em *${dataHoje}* recebeu uma atualização do órgão competente:\n\n❗ *Solicitação enviada fora do prazo.*\n\nVerifique a resposta pelo portal:\n${PORTAL_LINK}\n\n⚠️ Recomendamos entrar em contato com o órgão para verificar a possibilidade de *reagendamento ou nova orientação.*\n\nNão temos vínculo com o órgão responsável e *não nos responsabilizamos por prazos, perdas ou desdobramentos da solicitação.*\n\nCaso precise de *comprovantes ou documentos enviados pelo app*, você pode solicitar.`;
+    }
+    if(r==='incorreta'){
+      txt=`🚨 *MENSAGEM AUTOMÁTICA*\n\n*${nome}*, sua solicitação de perícia médica realizada em *${dataHoje}* recebeu uma atualização do órgão competente:\n\n❗ *Documentação enviada incorreta ou ilegível.*\n\nVerifique a resposta pelo portal:\n${PORTAL_LINK}\n\n⚠️ Recomendamos reenviar a documentação correta *o mais rápido possível.*\n\n*Não há garantia* de que ainda estará dentro do prazo do órgão.\n\nNão temos vínculo com o órgão responsável e *não nos responsabilizamos por prazos, perdas ou desdobramentos da solicitação.*`;
+    }
+  }
+
+  if(tipo==='vencimento'){
+    txt=`🚨 *AVISO DE VENCIMENTO*\n\nOlá, *${nome}*.\n\nSeu acesso ao app está próximo do vencimento.\n\nA validade encerra em *${addDays(3)}*.\n\nPara evitar o bloqueio, recomendamos realizar a renovação *antes dessa data.*\n\n⚠️ Após o vencimento, o acesso poderá ser *bloqueado até a regularização.*\n\nEm caso de dúvidas, estamos à disposição.`;
+  }
+
+  if(tipo==='bloqueio'){
+    const b=document.getElementById('gen-bloqueio').value;
+    if(!b){document.getElementById('message-preview').value='Selecione o motivo do bloqueio.';return}
+    const map={pagamento:'Falta de pagamento',nao_renovacao:'Não renovação',indisciplina:'Indisciplina'};
+    txt=`🚨 *AVISO DE BLOQUEIO*\n\nOlá, *${nome}*.\n\nSeu acesso ao app foi *bloqueado temporariamente.*\n\nMotivo: *${map[b]}*.\n\nPara voltar a utilizar o serviço normalmente, é necessário *regularizar a situação.*\n\nEm caso de dúvidas ou para solicitar a liberação, entre em contato conosco.`;
+  }
+
+  if(tipo==='renovacao'){
+    txt=`✅ *RENOVAÇÃO CONFIRMADA*\n\nOlá, *${nome}*.\n\nA renovação do seu acesso foi realizada com sucesso.\n\nSeu app ficará ativo por mais *90 dias*, com validade até *${addDays(90)}*.\n\nPara evitar bloqueio futuro, recomendamos renovar *antes do fim da validade.*\n\nEm caso de dúvidas, estamos à disposição.`;
+  }
+
+  if(tipo==='alteracao'){
+    txt=`🚨 *AVISO DE ALTERAÇÃO*\n\nOlá, *${nome}*.\n\nA alteração do seu cadastro foi *realizada com sucesso.*\n\nConfira as informações atualizadas e, caso identifique alguma divergência, entre em contato conosco.\n\n*[OBSERVAÇÃO EXTRA]*\n\nEm caso de dúvidas, estamos à disposição.`;
+  }
+
+  txt=applyObs(txt,obs);
+  document.getElementById('message-preview').value=txt;
+}
 function copyPreview(){const v=document.getElementById('message-preview').value;if(v)copy(v)}
 
 function renderReady(){const q=(document.getElementById('search-ready').value||'').toLowerCase();const arr=data.ready.filter(r=>r.title.toLowerCase().includes(q)||r.text.toLowerCase().includes(q));document.getElementById('ready-container').innerHTML=arr.length?arr.map(r=>`<div class="card item-card"><span class="badge badge-blue">Mensagem pronta</span><h3>${esc(r.title)}</h3><p>${esc(r.text)}</p><div class="item-footer"><div class="actions"><button class="btn btn-ghost" onclick="editReady('${r.id}')">${svg('i-edit')}</button><button class="btn btn-ghost" style="color:var(--danger)" onclick="del('ready','${r.id}')">${svg('i-trash')}</button></div><button class="btn btn-primary" onclick="copy(\`${js(r.text)}\`)">${svg('i-copy')}Copiar</button></div></div>`).join(''):'<div class="card muted">Nenhuma mensagem pronta cadastrada.</div>'}
@@ -550,8 +682,14 @@ async function dropTask(ev){
 async function taskStatus(id,st){const t=data.tasks.find(x=>x.id===id);if(t){t.status=st;await saveCloud('tasks',t);set('tasks',data.tasks);renderTasks();}}
 async function del(key,id){if(!confirm('Excluir este item?'))return;const ok=await deleteCloud(key,id);if(!ok)return;data[key]=data[key].filter(x=>x.id!==id);set(key,data[key]);renderDuvidas();renderReady();renderTutoriais();renderNotes();renderTasks();toast('Excluído!')}
 
-renderDuvidas();renderReady();renderTutoriais();renderNotes();renderTasks();
-loadFromSupabase();
+async function initPortal(){
+  renderDuvidas();renderReady();renderTutoriais();renderNotes();renderTasks();
+  await loadFromSupabase();
+  await ensureDefaultReadyTemplates();
+  renderReady();
+  renderTasks();
+}
+initPortal();
 setInterval(renderTasks,60000);
 </script>
 </body>
