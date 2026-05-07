@@ -183,6 +183,91 @@
       .mobile-move button{border:1px solid var(--border);background:#fff;border-radius:10px;padding:8px 5px;font-size:.72rem;color:var(--muted);font-weight:500}
       .mobile-move button.active{background:var(--primary-soft);color:var(--primary-dark);border-color:var(--primary-border)}
     }
+
+
+    /* --- MOBILE FIRST FINAL: portal pensado para mexer pelo celular --- */
+    @media(max-width:760px){
+      html,body{width:100%;max-width:100%;overflow-x:hidden}
+      body{background:#F8FCFD;padding-bottom:calc(72px + env(safe-area-inset-bottom));font-size:15px}
+      #sidebar{height:calc(64px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:rgba(255,255,255,.98);backdrop-filter:blur(10px)}
+      .nav-list{padding:5px 6px;grid-template-columns:repeat(5,1fr)}
+      .nav-item{font-size:.62rem;font-weight:600;letter-spacing:-.01em;padding:7px 1px;color:#63798B}
+      .nav-item.active{background:#EAF8FA;color:#087F8C}
+      .nav-item .icon{width:18px;height:18px;margin-bottom:1px}
+
+      main{padding:12px 10px calc(88px + env(safe-area-inset-bottom));}
+      .page-head{display:block;margin-bottom:10px}
+      .page-head h1{font-size:1.28rem;line-height:1.15;margin-bottom:3px}
+      .page-head p{font-size:.78rem;line-height:1.35;margin-top:4px;color:#607385}
+      .page-head .btn,.page-head .pill{margin-top:10px;width:100%;min-height:42px}
+      .pill{font-size:.72rem;border-radius:12px;text-align:center}
+
+      .card{border-radius:13px;padding:12px;border-color:#E4EFF3;background:#fff}
+      .card + .card{margin-top:0}
+      .card h2{font-size:.98rem!important;margin-bottom:10px!important}
+      .two-col{gap:10px!important}
+      .grid{gap:9px}
+
+      label{font-size:.78rem;margin-bottom:5px;color:#263F52}
+      .field{margin-bottom:10px}
+      .control{font-size:16px;min-height:43px;border-radius:11px;padding:10px 11px;background:#fff}
+      textarea.control{min-height:88px;line-height:1.45}
+      #message-preview{min-height:230px;font-size:15px}
+      .search-row{gap:7px;margin-bottom:10px}
+      .search{height:43px;padding:0 11px;border-radius:11px;background:#fff}
+      .search input{font-size:16px;padding:9px 0}
+
+      .btn{min-height:36px;border-radius:10px;font-size:.76rem;font-weight:500;padding:7px 9px}
+      .btn .icon{width:14px;height:14px}
+      .btn-primary{background:#087F8C}
+      .btn-ghost{min-height:34px;padding:6px 8px}
+
+      .item-card{gap:7px;padding:12px}
+      .item-card h3{font-size:.94rem;line-height:1.25}
+      .item-card p{font-size:.82rem;line-height:1.38;-webkit-line-clamp:3}
+      .item-footer{display:grid;grid-template-columns:1fr;gap:7px;border-top:1px solid #EEF5F7;margin-top:4px;padding-top:8px}
+      .item-footer .actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;order:2}
+      .item-footer .btn-primary{order:1;width:100%}
+      .item-footer .actions .btn{width:100%}
+      .badge{font-size:.6rem;padding:3px 7px;letter-spacing:.03em}
+
+      .ready-head{display:block;margin:18px 0 10px;padding-top:14px}
+      .ready-head h2{font-size:1rem}.ready-head p{font-size:.78rem;margin-top:3px}
+      .ready-head .btn{width:100%;margin-top:10px}
+
+      #tab-tutoriais .two-col{gap:10px!important}
+      .tutorial-add{order:1}.library{order:2}
+      .segment{border-radius:11px;margin-bottom:10px}
+      .seg-btn{height:36px;font-size:.72rem;gap:4px}.seg-btn .icon{width:14px;height:14px}
+      .tutorial-row{padding:11px;border-radius:12px}
+      .tutorial-row h3{font-size:.9rem;margin:5px 0 2px}
+      .tutorial-row .desc{font-size:.77rem;line-height:1.3}
+      .tutorial-preview{font-size:.75rem;line-height:1.35;margin-top:6px}
+      .tutorial-row .actions{grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px;padding-top:8px}
+      .tutorial-row .actions .btn{min-height:34px;font-size:.72rem;padding:6px 7px}
+
+      .kanban{display:block;overflow:visible;padding:0}
+      .kan-col{width:100%;min-width:0;min-height:auto;margin-bottom:10px;border-radius:13px;padding:11px;background:#fff}
+      .kan-col h3{font-size:.95rem;margin-bottom:8px}
+      .kan-drop{min-height:64px;padding:0}
+      .kan-empty{padding:16px 10px;font-size:.8rem;border-radius:12px}
+      .task{border-radius:12px;padding:11px;margin-bottom:8px;cursor:default;background:#fff}
+      .task-title{font-size:.9rem;line-height:1.25}
+      .task-desc{font-size:.8rem;line-height:1.35;margin:6px 0}
+      .task-date{font-size:.78rem;margin:6px 0;color:#607385}
+      .task-status{font-size:.67rem;padding:3px 7px;margin-top:5px}
+      .task .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
+      .task .actions .btn{width:100%;min-height:32px;font-size:.7rem;padding:5px 6px}
+      .mobile-move{grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px;padding-top:8px}
+      .mobile-move button{font-size:.68rem;min-height:32px;padding:6px 4px;border-radius:9px}
+
+      .modal{align-items:flex-end;padding:0;background:rgba(7,35,56,.32)}
+      .modal-box{width:100%;border-radius:18px 18px 0 0;padding:16px 14px calc(16px + env(safe-area-inset-bottom));max-height:88vh}
+      .modal-head{margin-bottom:12px}.modal-head h2{font-size:1.05rem}
+      .modal-actions{grid-template-columns:1fr;gap:7px;margin-top:12px}.modal-actions .btn{width:100%}
+      #view-content{font-size:.9rem;line-height:1.5!important}
+      #toast{bottom:calc(76px + env(safe-area-inset-bottom));left:10px;right:10px}.toast{font-size:.8rem;padding:11px 13px}
+    }
   </style>
 </head>
 <body>
@@ -206,10 +291,10 @@
   <aside id="sidebar">
     <div class="brand"><div class="brand-icon"><svg class="icon"><use href="#i-file"></use></svg></div><div><div class="brand-title">Atestado Fácil</div><div class="brand-sub">Portal interno</div></div></div>
     <ul class="nav-list">
-      <li class="nav-item active" onclick="switchTab('duvidas',this)"><svg class="icon"><use href="#i-msg"></use></svg>Dúvidas Prontas</li>
-      <li class="nav-item" onclick="switchTab('gerador',this)"><svg class="icon"><use href="#i-zap"></use></svg>Gerar Mensagem</li>
+      <li class="nav-item active" onclick="switchTab('duvidas',this)"><svg class="icon"><use href="#i-msg"></use></svg>Dúvidas</li>
+      <li class="nav-item" onclick="switchTab('gerador',this)"><svg class="icon"><use href="#i-zap"></use></svg>Mensagem</li>
       <li class="nav-item" onclick="switchTab('tutoriais',this)"><svg class="icon"><use href="#i-book"></use></svg>Tutoriais</li>
-      <li class="nav-item" onclick="switchTab('anotacoes',this)"><svg class="icon"><use href="#i-file"></use></svg>Anotações</li>
+      <li class="nav-item" onclick="switchTab('anotacoes',this)"><svg class="icon"><use href="#i-file"></use></svg>Notas</li>
       <li class="nav-item" onclick="switchTab('tarefas',this)"><svg class="icon"><use href="#i-check"></use></svg>Tarefas</li>
     </ul>
     <div class="profile"><div class="avatar">AT</div><div><p>Atendimento</p><span>Base de apoio</span></div></div>
@@ -283,7 +368,6 @@
 
     <section id="tab-tarefas" class="tab">
       <div class="page-head"><div><div class="eyebrow">Pendências</div><h1>Tarefas</h1><p>Kanban simples para não deixar retorno passar.</p></div><button class="btn btn-primary" onclick="openTask()"><svg class="icon"><use href="#i-plus"></use></svg>Nova tarefa</button></div>
-      <div class="task-demo"><svg class="icon"><use href="#i-check"></use></svg><span><strong>Demonstração:</strong> deixei uma tarefa de exemplo com vencimento de ontem. Ao abrir o portal, ela vai automaticamente para <strong>Vencidas</strong>. Se marcar como feita, ela sai de lá.</span></div>
       <div class="kanban"><div class="kan-col"><h3>Pendentes <span class="badge badge-gray" id="count-pendente">0</span></h3><div id="tasks-pendente" class="kan-drop" data-status="pendente" ondragover="allowTaskDrop(event)" ondragleave="leaveTaskDrop(event)" ondrop="dropTask(event)"></div></div><div class="kan-col"><h3>Feitas <span class="badge badge-gray" id="count-feita">0</span></h3><div id="tasks-feita" class="kan-drop" data-status="feita" ondragover="allowTaskDrop(event)" ondragleave="leaveTaskDrop(event)" ondrop="dropTask(event)"></div></div><div class="kan-col"><h3>Vencidas <span class="badge badge-gray" id="count-vencida">0</span></h3><div id="tasks-vencida" class="kan-drop" data-status="vencida" ondragover="allowTaskDrop(event)" ondragleave="leaveTaskDrop(event)" ondrop="dropTask(event)"></div></div></div>
     </section>
   </main>
@@ -409,7 +493,7 @@ function toast(msg){const t=document.createElement('div');t.className='toast';t.
 function esc(s=''){return String(s).replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
 function js(s=''){return String(s).replace(/`/g,'\\`').replace(/\\/g,'\\\\')}
 function copy(txt){navigator.clipboard?.writeText(txt).then(()=>toast('Copiado!')).catch(()=>{const a=document.createElement('textarea');a.value=txt;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast('Copiado!')})}
-function switchTab(id,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');el.classList.add('active')}
+function switchTab(id,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');el.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});if(document.activeElement)document.activeElement.blur();}
 function openModal(id){document.getElementById(id).classList.add('active')} function closeModal(id){document.getElementById(id).classList.remove('active')}
 function addDays(n){let d=new Date();d.setDate(d.getDate()+n);return d.toLocaleDateString('pt-BR')}
 
