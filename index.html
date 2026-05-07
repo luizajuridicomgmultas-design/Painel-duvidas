@@ -283,7 +283,6 @@
 
     <section id="tab-tarefas" class="tab">
       <div class="page-head"><div><div class="eyebrow">Pendências</div><h1>Tarefas</h1><p>Kanban simples para não deixar retorno passar.</p></div><button class="btn btn-primary" onclick="openTask()"><svg class="icon"><use href="#i-plus"></use></svg>Nova tarefa</button></div>
-      <div class="task-demo"><svg class="icon"><use href="#i-check"></use></svg><span><strong>Demonstração:</strong> deixei uma tarefa de exemplo com vencimento de ontem. Ao abrir o portal, ela vai automaticamente para <strong>Vencidas</strong>. Se marcar como feita, ela sai de lá.</span></div>
       <div class="kanban"><div class="kan-col"><h3>Pendentes <span class="badge badge-gray" id="count-pendente">0</span></h3><div id="tasks-pendente" class="kan-drop" data-status="pendente" ondragover="allowTaskDrop(event)" ondragleave="leaveTaskDrop(event)" ondrop="dropTask(event)"></div></div><div class="kan-col"><h3>Feitas <span class="badge badge-gray" id="count-feita">0</span></h3><div id="tasks-feita" class="kan-drop" data-status="feita" ondragover="allowTaskDrop(event)" ondragleave="leaveTaskDrop(event)" ondrop="dropTask(event)"></div></div><div class="kan-col"><h3>Vencidas <span class="badge badge-gray" id="count-vencida">0</span></h3><div id="tasks-vencida" class="kan-drop" data-status="vencida" ondragover="allowTaskDrop(event)" ondragleave="leaveTaskDrop(event)" ondrop="dropTask(event)"></div></div></div>
     </section>
   </main>
