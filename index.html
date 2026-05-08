@@ -138,7 +138,7 @@
       body{display:block;background:#F6F9FF;padding-bottom:76px}
       #sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;width:100%;height:68px;border-right:0;border-top:1px solid var(--border);box-shadow:0 -8px 22px rgba(7,35,56,.08);z-index:90}
       .brand,.profile{display:none}
-      .nav-list{height:100%;padding:6px 8px;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;overflow:visible}
+      .nav-list{height:100%;padding:6px 8px;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;overflow:visible}
       .nav-item{flex-direction:column;justify-content:center;gap:3px;padding:6px 2px;border-radius:11px;font-size:.64rem;line-height:1.1;text-align:center;white-space:normal}
       .nav-item .icon{width:17px;height:17px}
       main{margin:0;width:100%;max-width:none;padding:16px 12px 92px}
@@ -190,7 +190,7 @@
       html,body{width:100%;max-width:100%;overflow-x:hidden}
       body{background:#F8FBFF;padding-bottom:calc(72px + env(safe-area-inset-bottom));font-size:15px}
       #sidebar{height:calc(64px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:rgba(255,255,255,.98);backdrop-filter:blur(10px)}
-      .nav-list{padding:5px 6px;grid-template-columns:repeat(5,1fr)}
+      .nav-list{padding:5px 6px;grid-template-columns:repeat(7,1fr)}
       .nav-item{font-size:.62rem;font-weight:600;letter-spacing:-.01em;padding:7px 1px;color:#64748B}
       .nav-item.active{background:#EFF6FF;color:#1D4ED8}
       .nav-item .icon{width:18px;height:18px;margin-bottom:1px}
@@ -286,7 +286,7 @@
       body{background:#F6F9FF}
       main{padding:12px 10px calc(92px + env(safe-area-inset-bottom))}
       #sidebar{height:calc(70px + env(safe-area-inset-bottom));border-top:1px solid #DCE7FA;box-shadow:0 -12px 30px rgba(15,23,42,.08)}
-      .nav-list{grid-template-columns:repeat(5,1fr);padding:6px 7px;gap:5px}
+      .nav-list{grid-template-columns:repeat(7,1fr);padding:6px 7px;gap:5px}
       .nav-item{font-size:.61rem;border-radius:14px;min-width:0;color:#64748B}
       .nav-item.active{background:#2563EB;color:#fff;box-shadow:0 10px 22px rgba(37,99,235,.22)}
       .nav-item.active .icon{color:#fff}
@@ -312,6 +312,46 @@
       .kan-col{margin-bottom:0}
     }
 
+
+    /* --- MENU LATERAL NO CELULAR + TUTORIAIS/TAREFAS REFEITOS --- */
+    .links-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+    .link-card{background:#fff;border:1px solid #DCE7FA;border-radius:16px;padding:14px;box-shadow:0 8px 20px rgba(15,23,42,.035);display:flex;flex-direction:column;gap:9px}
+    .link-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.link-card h3{font-size:1rem;line-height:1.25}.link-card p{color:var(--muted);font-size:.84rem;line-height:1.42}.link-url{font-size:.78rem;color:#2563EB;background:#EFF6FF;border:1px solid #DBEAFE;border-radius:12px;padding:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.link-actions{display:grid;grid-template-columns:1fr 1fr auto;gap:7px;margin-top:auto}
+    @media(max-width:760px){
+      body{display:block;padding-bottom:0;background:#F6F9FF}
+      #sidebar{position:fixed;left:0;top:0;bottom:0;right:auto;width:82px;height:100vh;padding:8px 6px;background:#FFFFFF;border-top:0;border-right:1px solid #DCE7FA;box-shadow:8px 0 24px rgba(15,23,42,.06);z-index:90;overflow-y:auto}
+      #sidebar .brand{display:flex;padding:8px 4px 12px;border-bottom:1px solid #EEF4FF;justify-content:center}.brand .brand-title,.brand .brand-sub{display:none}.brand-icon{width:42px;height:42px;border-radius:14px}
+      .profile{display:none}.nav-list{height:auto;padding:10px 0;display:flex!important;flex-direction:column!important;grid-template-columns:none!important;gap:7px;overflow:visible}.nav-item{height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:7px 3px;border-radius:16px;font-size:.61rem;font-weight:700;line-height:1.05;text-align:center;color:#64748B}.nav-item .icon{width:20px;height:20px;margin:0}.nav-item.active{background:#2563EB;color:#fff;box-shadow:0 10px 22px rgba(37,99,235,.22)}
+      main{margin-left:82px;width:calc(100% - 82px);max-width:none;padding:12px 10px 18px}.page-head{border-radius:20px;padding:15px;margin-bottom:10px}.page-head h1{font-size:1.22rem}.page-head p{font-size:.78rem}.page-head .btn,.page-head .pill{min-height:38px;margin-top:9px}
+      #tab-tutoriais .two-col{display:flex!important;flex-direction:column;gap:10px!important}.tutorial-add{order:2}.library{order:1}.tutorial-add h2::after{content:' rápido';color:#64748B;font-weight:500}.segment{position:sticky;top:8px;z-index:3}.tutorial-row{padding:13px;border-radius:16px;border-color:#DCE7FA}.tutorial-row h3{font-size:.92rem;line-height:1.25}.tutorial-row .desc{font-size:.78rem;-webkit-line-clamp:2}.tutorial-preview{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:.76rem}.tutorial-row .actions{display:grid!important;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.tutorial-row .actions .btn{width:100%;justify-content:center}.tutorial-row .actions .btn-danger{grid-column:span 2}.tutorial-card-empty{padding:20px}
+      #tab-tarefas .page-head .btn-primary{width:100%}.kanban{display:flex!important;gap:10px;overflow-x:auto;padding:2px 0 10px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}.kan-col{min-width:calc(100vw - 112px);scroll-snap-align:start;min-height:calc(100vh - 190px);border-color:#DCE7FA}.kan-col h3{position:sticky;top:0;background:#fff;z-index:2;padding-bottom:8px}.kan-drop{min-height:140px}.task{background:#fff;border-color:#DCE7FA;border-left-width:5px}.task .actions{grid-template-columns:1fr 1fr;gap:6px}.task .actions .btn-danger{grid-column:span 2}.mobile-move{display:grid!important;grid-template-columns:repeat(3,1fr);gap:5px}.mobile-move button{font-size:.65rem}
+      .links-layout{display:flex!important;flex-direction:column;gap:10px!important}.link-form-card{order:2}.link-library{order:1}.links-grid{grid-template-columns:1fr;gap:9px}.link-card{border-radius:16px;padding:12px}.link-actions{grid-template-columns:1fr 1fr}.link-actions .btn-danger{grid-column:span 2}.select-small{min-width:0}.search-row{grid-template-columns:1fr!important}.modal{left:82px;width:calc(100% - 82px)}#toast{left:92px;right:10px;bottom:12px}
+    }
+
+  
+
+    /* --- MINI IA DE ATENDIMENTO --- */
+    .ai-layout{display:grid;grid-template-columns:minmax(0,1.25fr) 340px;gap:16px;align-items:start}
+    .ai-chat-card{padding:0;overflow:hidden;border-radius:20px}
+    .ai-chat-head{background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;padding:18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .ai-chat-head strong{font-size:1rem}.ai-chat-head span{display:block;font-size:.78rem;color:#DBEAFE;margin-top:3px;line-height:1.35}
+    .ai-status{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.18);padding:7px 10px;border-radius:999px;font-size:.72rem;font-weight:700;white-space:nowrap}
+    .ai-status::before{content:"";width:7px;height:7px;border-radius:999px;background:#BFDBFE}
+    .ai-chat-log{height:430px;overflow:auto;padding:16px;background:#F8FBFF;display:flex;flex-direction:column;gap:12px}
+    .ai-bubble{max-width:88%;border-radius:18px;padding:13px 14px;font-size:.9rem;line-height:1.5;white-space:pre-wrap;box-shadow:0 6px 18px rgba(15,23,42,.05)}
+    .ai-bubble.assistant{background:#fff;border:1px solid #DBEAFE;color:#1E293B;border-bottom-left-radius:6px;align-self:flex-start}
+    .ai-bubble.user{background:#2563EB;color:#fff;border-bottom-right-radius:6px;align-self:flex-end}
+    .ai-composer{padding:14px;background:#fff;border-top:1px solid #DBEAFE}
+    .ai-input{width:100%;min-height:112px;border:1px solid #BFDBFE;background:#F8FBFF;border-radius:16px;padding:13px;font-size:15px;line-height:1.45;outline:none;resize:vertical;color:#0F172A}
+    .ai-input:focus{background:#fff;border-color:#2563EB;box-shadow:0 0 0 4px #DBEAFE}
+    .ai-composer-actions{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-top:10px}
+    .ai-side{display:flex;flex-direction:column;gap:12px}
+    .ai-rule-list{display:flex;flex-direction:column;gap:9px;margin-top:10px}.ai-rule{display:flex;gap:9px;align-items:flex-start;font-size:.84rem;color:#475569;line-height:1.4}.ai-rule svg{width:16px;height:16px;color:#2563EB;margin-top:1px;flex:0 0 auto}
+    .ai-examples{display:flex;flex-direction:column;gap:8px;margin-top:10px}.ai-example{border:1px solid #DBEAFE;background:#EFF6FF;color:#1D4ED8;border-radius:13px;padding:10px 11px;text-align:left;font-size:.82rem;font-weight:650;line-height:1.35}.ai-example:hover{background:#DBEAFE}
+    .ai-copy-box{background:#F8FBFF;border:1px dashed #BFDBFE;border-radius:14px;padding:12px;color:#475569;font-size:.84rem;line-height:1.45;margin-top:10px}
+    @media(max-width:980px){.ai-layout{grid-template-columns:1fr}.ai-side{display:grid;grid-template-columns:1fr 1fr}.ai-chat-log{height:390px}}
+    @media(max-width:760px){.ai-layout{display:flex;flex-direction:column;gap:10px}.ai-chat-card{border-radius:16px}.ai-chat-head{padding:14px;align-items:flex-start}.ai-chat-head strong{font-size:.95rem}.ai-chat-head span{font-size:.74rem}.ai-status{font-size:.65rem;padding:6px 8px}.ai-chat-log{height:360px;padding:12px;gap:10px}.ai-bubble{max-width:94%;font-size:.84rem;padding:11px 12px;border-radius:15px}.ai-input{min-height:120px;font-size:16px;border-radius:14px}.ai-composer{padding:12px}.ai-composer-actions{grid-template-columns:1fr 1fr;gap:7px}.ai-composer-actions .btn:nth-child(3){grid-column:span 2}.ai-side{display:flex;width:100%}.ai-side .card{width:100%}.ai-rule{font-size:.8rem}.ai-example{font-size:.78rem;padding:9px 10px}}
+
   </style>
 </head>
 <body>
@@ -330,14 +370,17 @@
     <symbol id="i-video" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2"></rect></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></symbol>
+    <symbol id="i-robot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="3"></rect><path d="M12 8V4"></path><circle cx="9" cy="14" r="1"></circle><circle cx="15" cy="14" r="1"></circle><path d="M9 18h6"></path><path d="M2 13h2"></path><path d="M20 13h2"></path></symbol>
   </svg>
 
   <aside id="sidebar">
     <div class="brand"><div class="brand-icon"><svg class="icon"><use href="#i-file"></use></svg></div><div><div class="brand-title">Atestado Fácil</div><div class="brand-sub">Portal interno</div></div></div>
     <ul class="nav-list">
-      <li class="nav-item active" onclick="switchTab('duvidas',this)"><svg class="icon"><use href="#i-msg"></use></svg>Dúvidas</li>
+      <li class="nav-item active" onclick="switchTab('ia',this)"><svg class="icon"><use href="#i-robot"></use></svg>IA</li>
+      <li class="nav-item" onclick="switchTab('duvidas',this)"><svg class="icon"><use href="#i-msg"></use></svg>Dúvidas</li>
       <li class="nav-item" onclick="switchTab('gerador',this)"><svg class="icon"><use href="#i-zap"></use></svg>Mensagem</li>
       <li class="nav-item" onclick="switchTab('tutoriais',this)"><svg class="icon"><use href="#i-book"></use></svg>Tutoriais</li>
+      <li class="nav-item" onclick="switchTab('links',this)"><svg class="icon"><use href="#i-link"></use></svg>Links</li>
       <li class="nav-item" onclick="switchTab('anotacoes',this)"><svg class="icon"><use href="#i-file"></use></svg>Notas</li>
       <li class="nav-item" onclick="switchTab('tarefas',this)"><svg class="icon"><use href="#i-check"></use></svg>Tarefas</li>
     </ul>
@@ -345,7 +388,61 @@
   </aside>
 
   <main>
-    <section id="tab-duvidas" class="tab active">
+    <section id="tab-ia" class="tab active">
+      <div class="page-head"><div><div class="eyebrow">Assistente interno</div><h1>IA de Atendimento</h1><p>Seu irmão cola a mensagem da cliente e a IA sugere uma resposta curta, segura e pronta para WhatsApp.</p></div><span class="pill">Front pronto • conectar endpoint depois</span></div>
+      <div class="ai-layout">
+        <div class="card ai-chat-card">
+          <div class="ai-chat-head">
+            <div><strong>Mini chat de resposta</strong><span>Use como rascunho. A resposta deve ser revisada antes de enviar ao cliente.</span></div>
+            <div class="ai-status">Modo simulação</div>
+          </div>
+          <div id="ai-chat-log" class="ai-chat-log">
+            <div class="ai-bubble assistant">Me mande o nome da cliente e a mensagem que ela enviou.
+
+Exemplo:
+Cliente: Angela
+Mensagem dela: Meu atestado foi enviado fora do prazo. E agora?</div>
+          </div>
+          <div class="ai-composer">
+            <textarea id="ai-input" class="ai-input" placeholder="Cole aqui a mensagem. Ex:
+Cliente: Angela
+Mensagem dela: O órgão respondeu que a documentação está ilegível. O que eu respondo?"></textarea>
+            <div class="ai-composer-actions">
+              <button class="btn btn-primary" onclick="generateAiReply()"><svg class="icon"><use href="#i-zap"></use></svg>Gerar resposta</button>
+              <button class="btn btn-secondary" onclick="copyAiReply()"><svg class="icon"><use href="#i-copy"></use></svg>Copiar</button>
+              <button class="btn btn-ghost" onclick="clearAiChat()">Limpar</button>
+            </div>
+          </div>
+        </div>
+        <div class="ai-side">
+          <div class="card">
+            <h2>Regras da IA</h2>
+            <div class="ai-rule-list">
+              <div class="ai-rule"><svg class="icon"><use href="#i-check"></use></svg><span>Responder curto, claro e em tom de WhatsApp.</span></div>
+              <div class="ai-rule"><svg class="icon"><use href="#i-check"></use></svg><span>Não prometer aprovação, prazo ou resultado do órgão.</span></div>
+              <div class="ai-rule"><svg class="icon"><use href="#i-check"></use></svg><span>Reforçar que não temos vínculo com a Prefeitura quando necessário.</span></div>
+              <div class="ai-rule"><svg class="icon"><use href="#i-check"></use></svg><span>Quando faltar contexto, pedir print, protocolo ou mais detalhes.</span></div>
+            </div>
+            <div class="ai-copy-box">Depois você conecta o botão em um endpoint, por exemplo: <b>/api/gerar-resposta</b>.</div>
+          </div>
+          <div class="card">
+            <h2>Testes rápidos</h2>
+            <div class="ai-examples">
+              <button class="ai-example" onclick="setAiExample('Cliente: Angela
+Mensagem dela: Meu atestado foi enviado fora do prazo. E agora?')">Fora do prazo</button>
+              <button class="ai-example" onclick="setAiExample('Cliente: Carla
+Mensagem dela: O órgão respondeu que meu documento está ilegível.')">Documento ilegível</button>
+              <button class="ai-example" onclick="setAiExample('Cliente: João
+Mensagem dele: Já enviei. Como acompanho o protocolo?')">Acompanhar protocolo</button>
+              <button class="ai-example" onclick="setAiExample('Cliente: Maria
+Mensagem dela: O app não está abrindo no meu celular.')">Erro no app</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-duvidas" class="tab">
       <div class="page-head"><div><div class="eyebrow">Base rápida</div><h1>Dúvidas e Regras</h1><p>Respostas padronizadas para copiar durante o atendimento.</p></div><button class="btn btn-primary" onclick="openDuvida()"><svg class="icon"><use href="#i-plus"></use></svg>Adicionar dúvida</button></div>
       <div class="search-row"><div class="search"><svg class="icon"><use href="#i-search"></use></svg><input id="search-duvidas" oninput="renderDuvidas()" placeholder="Pesquisar dúvidas..."></div><select id="filter-tipo" class="control select-small" onchange="renderDuvidas()"><option value="">Todos os tipos</option><option>Prazo</option><option>Documentação</option><option>Processo</option><option>Responsabilidade</option></select><select id="filter-subtipo" class="control select-small" onchange="renderDuvidas()"><option value="">Todos</option><option>Aplicativo</option><option>Formulário</option></select></div>
       <div id="duvidas-container" class="grid"></div>
@@ -401,6 +498,27 @@
         <div class="quick-card"><strong>Checklist antes de enviar</strong><span>Confirme se os documentos estão legíveis, completos e sem corte antes de orientar o cliente.</span></div>
         <div class="quick-card"><strong>Resposta do órgão</strong><span>Oriente o cliente a acompanhar o protocolo no portal, pois o retorno não depende do aplicativo.</span></div>
         <div class="quick-card"><strong>Atendimento rápido</strong><span>Use tutoriais em texto para WhatsApp e vídeos para dúvidas que se repetem muito.</span></div>
+      </div>
+    </section>
+
+    <section id="tab-links" class="tab">
+      <div class="page-head"><div><div class="eyebrow">Acessos rápidos</div><h1>Links dos sistemas</h1><p>Guarde aqui todos os links que fazem parte do app, atendimento, painel, órgão e ferramentas de apoio.</p></div><button class="btn btn-primary" onclick="openLinkForm()"><svg class="icon"><use href="#i-plus"></use></svg>Novo link</button></div>
+      <div class="two-col links-layout">
+        <div class="card link-form-card" id="link-form-card">
+          <h2 style="margin-bottom:14px" id="link-form-title">Adicionar link</h2>
+          <input type="hidden" id="link-id">
+          <div class="field"><label>Nome do sistema</label><input id="link-title" class="control" placeholder="Ex: Painel Atestado Fácil"></div>
+          <div class="field"><label>Categoria</label><select id="link-category" class="control"><option>App</option><option>Painel</option><option>Landing Page</option><option>Órgão</option><option>Supabase</option><option>Vercel</option><option>WhatsApp</option><option>Outro</option></select></div>
+          <div class="field"><label>Link</label><input id="link-url" class="control" placeholder="https://..."></div>
+          <div class="field"><label>Observação</label><textarea id="link-desc" class="control" placeholder="Para que esse link serve?"></textarea></div>
+          <button class="btn btn-primary" style="width:100%" onclick="saveLink()"><svg class="icon"><use href="#i-plus"></use></svg><span id="link-save-label">Salvar link</span></button>
+          <button id="link-cancel" class="btn btn-secondary" style="width:100%;margin-top:10px;display:none" onclick="cancelLinkEdit()">Cancelar edição</button>
+        </div>
+        <div class="card link-library">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px"><div><h2>Biblioteca de links <span class="muted" id="links-count">(0)</span></h2><p class="muted">Clique para abrir, copiar ou editar.</p></div></div>
+          <div class="search-row"><div class="search"><svg class="icon"><use href="#i-search"></use></svg><input id="search-links" oninput="renderLinks()" placeholder="Pesquisar links..."></div><select id="filter-links" class="control select-small" onchange="renderLinks()"><option value="">Todas categorias</option><option>App</option><option>Painel</option><option>Landing Page</option><option>Órgão</option><option>Supabase</option><option>Vercel</option><option>WhatsApp</option><option>Outro</option></select></div>
+          <div id="links-container" class="links-grid"></div>
+        </div>
       </div>
     </section>
 
@@ -525,13 +643,19 @@ const defaults={
   ],
   notes:[],
   anexos:[],
+  links:[
+    {id:'l1',title:'Portal de consulta do órgão',category:'Órgão',url:PORTAL_LINK,desc:'Consulta de tramitação e protocolo da Prefeitura de Contagem.'},
+    {id:'l2',title:'App Atestado Fácil',category:'App',url:'https://atestado-facil-app.vercel.app/',desc:'Aplicativo usado pelo cliente para preencher e enviar o formulário.'},
+    {id:'l3',title:'Painel administrativo',category:'Painel',url:'https://painel-atestado-facil.vercel.app/',desc:'Painel para códigos, clientes, faturamento e controle interno.'},
+    {id:'l4',title:'Landing page',category:'Landing Page',url:'https://atestado-facil-theta.vercel.app/',desc:'Página de venda e captação de clientes.'}
+  ],
   tasks:[
     {id:'demo-vencida',title:'Demonstração de tarefa vencida',desc:'Esta tarefa venceu ontem. Ela começa como pendente e o sistema move sozinho para Vencidas.',date:new Date(Date.now()-86400000).toISOString().split('T')[0],status:'pendente'}
   ]
 };
 function get(k){return JSON.parse(localStorage.getItem('af_'+k+'_v9')||JSON.stringify(defaults[k]||[]))}
 function set(k,v){localStorage.setItem('af_'+k+'_v9',JSON.stringify(v))}
-let data={duvidas:get('duvidas'),ready:get('ready'),tutoriais:get('tutoriais'),notes:get('notes'),anexos:get('anexos'),tasks:get('tasks')};
+let data={duvidas:get('duvidas'),ready:get('ready'),tutoriais:get('tutoriais'),notes:get('notes'),anexos:get('anexos'),links:get('links'),tasks:get('tasks')};
 function svg(id){return `<svg class="icon"><use href="#${id}"></use></svg>`}
 function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.getElementById('toast').appendChild(t);setTimeout(()=>t.remove(),2600)}
 function esc(s=''){return String(s).replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
@@ -542,7 +666,7 @@ function openModal(id){document.getElementById(id).classList.add('active')} func
 function addDays(n){let d=new Date();d.setDate(d.getDate()+n);return d.toLocaleDateString('pt-BR')}
 
 function isUuid(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(v||''))}
-function saveLocalAll(){set('duvidas',data.duvidas);set('ready',data.ready);set('tutoriais',data.tutoriais);set('notes',data.notes);set('tasks',data.tasks);set('anexos',data.anexos||[])}
+function saveLocalAll(){set('duvidas',data.duvidas);set('ready',data.ready);set('tutoriais',data.tutoriais);set('notes',data.notes);set('links',data.links);set('tasks',data.tasks);set('anexos',data.anexos||[])}
 function fromDb(table,row){
   if(table==='duvidas')return {id:row.id,title:row.titulo,type:row.tipo,subtype:row.subtipo,text:row.texto};
   if(table==='ready')return {id:row.id,title:row.titulo,text:row.texto};
@@ -627,6 +751,63 @@ async function ensureDefaultReadyTemplates(){
     }
   }
   if(changed){set('ready',data.ready);renderReady();}
+}
+
+
+let lastAiReply='';
+function extractClientName(raw){
+  const t=String(raw||'');
+  const match=t.match(/cliente\s*:\s*([^\n\r]+)/i)||t.match(/nome\s*:\s*([^\n\r]+)/i);
+  if(match){return match[1].trim().split(/\s+/)[0].replace(/[.,;:]/g,'')}
+  return '';
+}
+function buildAiReply(raw){
+  const text=String(raw||'').toLowerCase();
+  const nome=extractClientName(raw);
+  const oi=nome?`Olá, ${nome}!`:'Olá!';
+  let resposta='';
+  if(/fora do prazo|prazo|atrasad|perdi o prazo/.test(text)){
+    resposta=`${oi} Quando o envio acontece fora do prazo, o órgão pode recusar ou solicitar correção.\n\nO Atestado Fácil ajuda no preenchimento e envio por e-mail, mas não temos vínculo com a Prefeitura e não conseguimos garantir aceite.\n\nMe envie o protocolo ou print do retorno para verificarmos melhor.`;
+  }else if(/ileg[ií]vel|documento|anexo|foto|borrad|cortad|incorreta/.test(text)){
+    resposta=`${oi} Nesse caso, o ideal é enviar o documento novamente, em uma foto mais nítida, sem cortes e sem partes borradas.\n\nDocumento ilegível pode prejudicar a análise do órgão.\n\nPode me mandar o print da resposta ou o documento correto para conferirmos?`;
+  }else if(/protocolo|acompanhar|consulta|resposta do [óo]rg[aã]o|status/.test(text)){
+    resposta=`${oi} Para acompanhar, acesse o portal de consulta do órgão e verifique pelo número do protocolo.\n\nO retorno depende do órgão responsável, pois o Atestado Fácil apenas auxilia no preenchimento e envio por e-mail.\n\nSe aparecer alguma resposta, me envie o print para verificarmos.`;
+  }else if(/erro|n[aã]o abre|trav|bug|n[aã]o consigo|falha|tela branca/.test(text)){
+    resposta=`${oi} Me envie um print ou gravação rápida da tela onde aparece o erro, por favor.\n\nTambém tente fechar e abrir o app novamente. Se continuar, verificamos o que pode estar acontecendo e te orientamos.`;
+  }else if(/pagamento|pix|comprovante|acesso|c[oó]digo|comprar|adquirir/.test(text)){
+    resposta=`${oi} Para liberar o acesso, precisamos confirmar seus dados e o pagamento.\n\nO acesso é individual e válido pelo período informado no atendimento.\n\nMe envie o comprovante para seguirmos com a liberação do código.`;
+  }else if(/renovar|renova[cç][aã]o|venceu|vencido|bloqueado/.test(text)){
+    resposta=`${oi} Podemos verificar a renovação do seu acesso.\n\nMe envie o nome completo ou o código usado no app para conferirmos a situação e te passar a orientação correta.`;
+  }else{
+    resposta=`${oi} Entendi. Para te orientar com segurança, me envie um print da mensagem ou mais detalhes do que apareceu.\n\nO Atestado Fácil ajuda no preenchimento e envio por e-mail do formulário, mas não temos vínculo com a Prefeitura nem controle sobre a análise do órgão.`;
+  }
+  return `Recomendo responder assim:\n\n${resposta}`;
+}
+function addAiBubble(role,text){
+  const log=document.getElementById('ai-chat-log'); if(!log)return;
+  const div=document.createElement('div'); div.className=`ai-bubble ${role}`; div.textContent=text;
+  log.appendChild(div); log.scrollTop=log.scrollHeight;
+}
+function generateAiReply(){
+  const input=document.getElementById('ai-input'); if(!input)return;
+  const raw=input.value.trim(); if(!raw)return toast('Cole a mensagem da cliente primeiro.');
+  addAiBubble('user', raw);
+  lastAiReply=buildAiReply(raw);
+  setTimeout(()=>addAiBubble('assistant', lastAiReply),180);
+  input.value='';
+}
+function copyAiReply(){
+  if(!lastAiReply)return toast('Gere uma resposta primeiro.');
+  const clean=lastAiReply.replace(/^Recomendo responder assim:\n\n/i,'');
+  copy(clean);
+}
+function clearAiChat(){
+  const log=document.getElementById('ai-chat-log'); if(!log)return;
+  lastAiReply='';
+  log.innerHTML='<div class="ai-bubble assistant">Me mande o nome da cliente e a mensagem que ela enviou.\n\nExemplo:\nCliente: Angela\nMensagem dela: Meu atestado foi enviado fora do prazo. E agora?</div>';
+}
+function setAiExample(text){
+  const input=document.getElementById('ai-input'); if(input){input.value=text; input.focus();}
 }
 
 function renderDuvidas(){const q=(document.getElementById('search-duvidas').value||'').toLowerCase(),tp=document.getElementById('filter-tipo').value,st=document.getElementById('filter-subtipo').value;const arr=data.duvidas.filter(d=>(!tp||d.type===tp)&&(!st||d.subtype===st)&&(d.title.toLowerCase().includes(q)||d.text.toLowerCase().includes(q)));document.getElementById('duvidas-container').innerHTML=arr.length?arr.map(d=>`<div class="card item-card"><div><span class="badge badge-blue">${esc(d.type)}</span> <span class="badge badge-gray">${esc(d.subtype)}</span></div><h3>${esc(d.title)}</h3><p>${esc(d.text)}</p><div class="item-footer"><div class="actions"><button class="btn btn-ghost" onclick="editDuvida('${d.id}')">${svg('i-edit')}</button><button class="btn btn-ghost" style="color:var(--danger)" onclick="del('duvidas','${d.id}')">${svg('i-trash')}</button></div><button class="btn btn-primary" onclick="copy(\`${js(d.text)}\`)">${svg('i-copy')}Copiar</button></div></div>`).join(''):'<div class="card muted">Nenhuma dúvida encontrada.</div>'}
@@ -720,6 +901,29 @@ function renderTutoriais(){
 function viewTutorial(id){const t=data.tutoriais.find(x=>x.id===id);if(!t)return;document.getElementById('view-title').textContent=t.title;document.getElementById('view-content').innerHTML=`<span class="badge badge-blue">${esc(t.type)}</span>${t.desc?`<p style="margin:12px 0;color:var(--ink)">${esc(t.desc)}</p>`:''}<div style="margin-top:14px;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap">${esc(t.content)}</div>`;document.getElementById('view-actions').innerHTML=t.type==='texto'?`<button class="btn btn-primary" onclick="copy(\`${js(t.content)}\`)">${svg('i-copy')}Copiar</button>`:`<a class="btn btn-primary" href="${esc(t.content)}" target="_blank">${svg('i-link')}Abrir link</a>`;openModal('modal-view')}
 function editTutorial(id){const t=data.tutoriais.find(x=>x.id===id);if(!t)return;document.getElementById('tutorial-id').value=t.id;setTutorialType(t.type);document.getElementById('tutorial-title').value=t.title;document.getElementById('tutorial-desc').value=t.desc||'';document.getElementById('tutorial-content').value=t.content;document.getElementById('tutorial-save-label').textContent='Salvar alteração';document.getElementById('tutorial-cancel').style.display='inline-flex';window.scrollTo({top:0,behavior:'smooth'})}
 
+
+function openLinkForm(){clearLinkForm();document.getElementById('link-form-card')?.scrollIntoView({behavior:'smooth',block:'start'});}
+function clearLinkForm(){document.getElementById('link-id').value='';document.getElementById('link-title').value='';document.getElementById('link-category').value='App';document.getElementById('link-url').value='';document.getElementById('link-desc').value='';document.getElementById('link-form-title').textContent='Adicionar link';document.getElementById('link-save-label').textContent='Salvar link';document.getElementById('link-cancel').style.display='none'}
+function cancelLinkEdit(){clearLinkForm()}
+function normalizedUrl(url){const u=String(url||'').trim();if(!u)return '';return /^https?:\/\//i.test(u)?u:'https://'+u}
+function renderLinks(){
+  const q=(document.getElementById('search-links')?.value||'').toLowerCase();
+  const cat=document.getElementById('filter-links')?.value||'';
+  const arr=(data.links||[]).filter(l=>(!cat||l.category===cat)&&(`${l.title||''} ${l.category||''} ${l.url||''} ${l.desc||''}`.toLowerCase().includes(q)));
+  const count=document.getElementById('links-count');if(count)count.textContent=`(${(data.links||[]).length})`;
+  const el=document.getElementById('links-container');if(!el)return;
+  el.innerHTML=arr.length?arr.map(l=>`<div class="link-card">
+    <div class="link-top"><span class="badge badge-blue">${esc(l.category||'Link')}</span><button class="btn btn-ghost" onclick="editLink('${l.id}')">${svg('i-edit')}</button></div>
+    <h3>${esc(l.title)}</h3>
+    ${l.desc?`<p>${esc(l.desc)}</p>`:''}
+    <div class="link-url">${esc(l.url)}</div>
+    <div class="link-actions"><a class="btn btn-primary" href="${esc(normalizedUrl(l.url))}" target="_blank">${svg('i-link')}Abrir</a><button class="btn btn-secondary" onclick="copy('${js(l.url)}')">${svg('i-copy')}Copiar</button><button class="btn btn-danger" onclick="deleteLink('${l.id}')">${svg('i-trash')}</button></div>
+  </div>`).join(''):'<div class="library-empty"><div>Nenhum link cadastrado ainda.</div></div>';
+}
+function editLink(id){const l=(data.links||[]).find(x=>x.id===id);if(!l)return;document.getElementById('link-id').value=l.id;document.getElementById('link-title').value=l.title||'';document.getElementById('link-category').value=l.category||'Outro';document.getElementById('link-url').value=l.url||'';document.getElementById('link-desc').value=l.desc||'';document.getElementById('link-form-title').textContent='Editar link';document.getElementById('link-save-label').textContent='Salvar alteração';document.getElementById('link-cancel').style.display='inline-flex';document.getElementById('link-form-card')?.scrollIntoView({behavior:'smooth',block:'start'});}
+function saveLink(){const id=document.getElementById('link-id').value||String(Date.now());const obj={id,title:document.getElementById('link-title').value.trim(),category:document.getElementById('link-category').value,url:normalizedUrl(document.getElementById('link-url').value),desc:document.getElementById('link-desc').value.trim()};if(!obj.title||!obj.url)return toast('Preencha nome e link.');const i=(data.links||[]).findIndex(x=>x.id===id);if(i>=0)data.links[i]=obj;else{data.links=data.links||[];data.links.unshift(obj)};set('links',data.links);clearLinkForm();renderLinks();toast('Link salvo!')}
+function deleteLink(id){if(!confirm('Excluir este link?'))return;data.links=(data.links||[]).filter(x=>x.id!==id);set('links',data.links);renderLinks();toast('Link excluído!')}
+
 function openNote(){document.getElementById('note-text').value='';openModal('modal-note')}async function saveNote(){const text=document.getElementById('note-text').value;if(!text)return;let obj={id:'',text,date:new Date().toLocaleDateString('pt-BR')};obj=await saveCloud('notes',obj);data.notes.unshift(obj);set('notes',data.notes);closeModal('modal-note');renderNotes();toast('Anotação salva!')}function renderNotes(){const q=(document.getElementById('search-notes')?.value||'').toLowerCase();const arr=data.notes.filter(n=>n.text.toLowerCase().includes(q));document.getElementById('notes-container').innerHTML=arr.length?arr.map(n=>`<div class="card item-card"><span class="badge badge-gray">${n.date}</span><p>${esc(n.text)}</p><div class="item-footer"><button class="btn btn-danger" onclick="del('notes','${n.id}')">Excluir</button></div></div>`).join(''):'<div class="card muted">Nenhuma anotação.</div>'}
 function normalizeTasks(){
   const today=new Date().toISOString().split('T')[0];
@@ -811,7 +1015,7 @@ async function taskStatus(id,st){const t=data.tasks.find(x=>x.id===id);if(t){t.s
 async function del(key,id){if(!confirm('Excluir este item?'))return;const ok=await deleteCloud(key,id);if(!ok)return;data[key]=data[key].filter(x=>x.id!==id);set(key,data[key]);renderDuvidas();renderReady();renderTutoriais();renderNotes();renderTasks();toast('Excluído!')}
 
 async function initPortal(){
-  renderDuvidas();renderReady();renderTutoriais();renderNotes();renderTasks();
+  renderDuvidas();renderReady();renderTutoriais();renderLinks();renderNotes();renderTasks();
   await loadFromSupabase();
   await ensureDefaultReadyTemplates();
   renderReady();
