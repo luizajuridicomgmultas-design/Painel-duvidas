@@ -1040,6 +1040,7 @@ const defaults={
 function get(k){return JSON.parse(localStorage.getItem('af_'+k+'_v9')||JSON.stringify(defaults[k]||[]))}
 function set(k,v){localStorage.setItem('af_'+k+'_v9',JSON.stringify(v))}
 let data={duvidas:get('duvidas'),ready:get('ready'),tutoriais:get('tutoriais'),notes:get('notes'),anexos:get('anexos'),links:get('links'),tasks:get('tasks')};
+const TABLES={duvidas:'duvidas_prontas',ready:'mensagens_prontas',tutoriais:'tutoriais',tasks:'tarefas',notes:'anotacoes',links:'links'};
 function svg(id){return `<svg class="icon"><use href="#${id}"></use></svg>`}
 function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.getElementById('toast').appendChild(t);setTimeout(()=>t.remove(),2600)}
 function esc(s=''){return String(s).replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
@@ -1053,56 +1054,93 @@ function addDays(n){let d=new Date();d.setDate(d.getDate()+n);return d.toLocaleD
 
 function isUuid(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(v||''))}
 function saveLocalAll(){set('duvidas',data.duvidas);set('ready',data.ready);set('tutoriais',data.tutoriais);set('notes',data.notes);set('links',data.links);set('tasks',data.tasks);set('anexos',data.anexos||[])}
+function normalizeDbRow(row){return row||{}}
+function firstVal(row,keys,fb=''){for(const k of keys){if(row&&row[k]!==undefined&&row[k]!==null)return row[k]}return fb}
 function fromDb(table,row){
-  if(table==='duvidas')return {id:row.id,title:row.titulo,type:row.tipo,subtype:row.subtipo,text:row.texto};
-  if(table==='ready')return {id:row.id,title:row.titulo,text:row.texto};
-  if(table==='tutoriais')return {id:row.id,type:row.tipo,title:row.titulo,desc:row.descricao||'',content:row.conteudo||row.link||''};
-  if(table==='tasks')return {id:row.id,title:row.titulo,desc:row.descricao||'',date:row.vencimento,status:row.status||'pendente'};
-  if(table==='notes')return {id:row.id,title:row.titulo||'',text:row.texto,date:row.criado_em?new Date(row.criado_em).toLocaleDateString('pt-BR'):new Date().toLocaleDateString('pt-BR')};
+  row=normalizeDbRow(row);
+  if(table==='duvidas')return {id:row.id,title:firstVal(row,['titulo','title']),type:firstVal(row,['tipo','type'],'Geral'),subtype:firstVal(row,['subtipo','subtype'],'Aplicativo'),text:firstVal(row,['resposta','texto','text','conteudo','content'])};
+  if(table==='ready')return {id:row.id,title:firstVal(row,['titulo','title']),type:firstVal(row,['tipo','type'],'Geral'),text:firstVal(row,['mensagem','texto','text','conteudo','content'])};
+  if(table==='tutoriais')return {id:row.id,type:firstVal(row,['tipo','type'],'texto'),title:firstVal(row,['titulo','title']),desc:firstVal(row,['descricao','desc'],''),content:firstVal(row,['conteudo','content','link','url'],'')};
+  if(table==='tasks')return {id:row.id,title:firstVal(row,['titulo','title']),desc:firstVal(row,['descricao','desc'],''),date:firstVal(row,['vencimento','date','due_date'],''),status:firstVal(row,['status'],'pendente')};
+  if(table==='notes')return {id:row.id,title:firstVal(row,['titulo','title'],''),text:firstVal(row,['texto','text','conteudo','content']),date:firstVal(row,['criado_em','created_at'])?new Date(firstVal(row,['criado_em','created_at'])).toLocaleDateString('pt-BR'):new Date().toLocaleDateString('pt-BR')};
+  if(table==='links')return {id:row.id,title:firstVal(row,['titulo','title','nome']),category:firstVal(row,['categoria','category'],'Outro'),url:firstVal(row,['url','link']),desc:firstVal(row,['descricao','desc','observacao'],'')};
   if(table==='anexos')return {id:row.id,item_id:row.item_id,nome_arquivo:row.nome_arquivo,url_publica:row.url_publica,tipo_arquivo:row.tipo_arquivo,caminho_arquivo:row.caminho_arquivo};
 }
-function toDb(table,obj){
-  if(table==='duvidas')return {titulo:obj.title,tipo:obj.type,subtipo:obj.subtype,texto:obj.text};
-  if(table==='ready')return {titulo:obj.title,texto:obj.text};
-  if(table==='tutoriais')return {titulo:obj.title,tipo:obj.type,descricao:obj.desc||'',conteudo:obj.type==='texto'?obj.content:'',link:obj.type!=='texto'?obj.content:''};
-  if(table==='tasks')return {titulo:obj.title,descricao:obj.desc||'',vencimento:obj.date||null,status:obj.status||'pendente'};
-  if(table==='notes')return {titulo:obj.title||'',texto:obj.text};
+function toDbVariants(table,obj){
+  if(table==='duvidas')return [
+    {titulo:obj.title,tipo:obj.type,subtipo:obj.subtype,resposta:obj.text,ativo:true},
+    {titulo:obj.title,tipo:obj.type,subtipo:obj.subtype,texto:obj.text}
+  ];
+  if(table==='ready')return [
+    {titulo:obj.title,tipo:obj.type||'Geral',mensagem:obj.text,ativo:true},
+    {titulo:obj.title,texto:obj.text}
+  ];
+  if(table==='tutoriais')return [
+    {titulo:obj.title,tipo:obj.type,descricao:obj.desc||'',conteudo:obj.type==='texto'?obj.content:'',link:obj.type!=='texto'?obj.content:''}
+  ];
+  if(table==='tasks')return [{titulo:obj.title,descricao:obj.desc||'',vencimento:obj.date||null,status:obj.status||'pendente'}];
+  if(table==='notes')return [{titulo:obj.title||'',texto:obj.text}];
+  if(table==='links')return [
+    {titulo:obj.title,categoria:obj.category||'Outro',url:obj.url,descricao:obj.desc||''},
+    {nome:obj.title,categoria:obj.category||'Outro',link:obj.url,observacao:obj.desc||''}
+  ];
+  return [obj];
+}
+function toDb(table,obj){return toDbVariants(table,obj)[0]}
+async function safeSelect(table){
+  if(!useSupabase)return {data:[],error:null};
+  const res=await supabaseClient.from(table).select('*');
+  if(res.error)console.warn('Erro ao carregar tabela',table,res.error);
+  return res;
 }
 async function loadFromSupabase(){
   if(!useSupabase)return;
   try{
-    const [duvidas,ready,tutoriais,notes,tasks,anexos]=await Promise.all([
-      supabaseClient.from('duvidas').select('*').order('criado_em',{ascending:false}),
-      supabaseClient.from('mensagens_prontas').select('*').order('criado_em',{ascending:false}),
-      supabaseClient.from('tutoriais').select('*').order('criado_em',{ascending:false}),
-      supabaseClient.from('anotacoes').select('*').order('criado_em',{ascending:false}),
-      supabaseClient.from('tarefas').select('*').order('criado_em',{ascending:false}),
-      supabaseClient.from('anexos').select('*').order('criado_em',{ascending:false})
+    const [duvidas,ready,tutoriais,notes,tasks,anexos,links,chat]=await Promise.all([
+      safeSelect(TABLES.duvidas),
+      safeSelect(TABLES.ready),
+      safeSelect(TABLES.tutoriais),
+      safeSelect(TABLES.notes),
+      safeSelect(TABLES.tasks),
+      safeSelect('anexos'),
+      safeSelect(TABLES.links),
+      safeSelect('chat_atendimentos')
     ]);
-    const results=[duvidas,ready,tutoriais,notes,tasks,anexos];
-    if(results.some(r=>r.error)){console.error(results.map(r=>r.error).filter(Boolean));toast('Não consegui carregar tudo do Supabase. Usando dados locais.');return;}
-    if(duvidas.data.length)data.duvidas=duvidas.data.map(r=>fromDb('duvidas',r));
-    if(ready.data.length)data.ready=ready.data.map(r=>fromDb('ready',r));
-    if(tutoriais.data.length)data.tutoriais=tutoriais.data.map(r=>fromDb('tutoriais',r));
-    if(notes.data.length)data.notes=notes.data.map(r=>fromDb('notes',r));
-    if(tasks.data.length)data.tasks=tasks.data.map(r=>fromDb('tasks',r));
-    data.anexos=anexos.data.map(r=>fromDb('anexos',r));
-    saveLocalAll();renderDuvidas();renderReady();renderTutoriais();renderNotes();renderTasks();toast('Dados carregados do Supabase!');
+
+    if(!duvidas.error&&duvidas.data?.length)data.duvidas=duvidas.data.map(r=>fromDb('duvidas',r)).filter(x=>x.title||x.text);
+    if(!ready.error&&ready.data?.length)data.ready=ready.data.map(r=>fromDb('ready',r)).filter(x=>x.title||x.text);
+    if(!tutoriais.error&&tutoriais.data?.length)data.tutoriais=tutoriais.data.map(r=>fromDb('tutoriais',r)).filter(x=>x.title||x.content);
+    if(!notes.error&&notes.data?.length)data.notes=notes.data.map(r=>fromDb('notes',r)).filter(x=>x.text);
+    if(!tasks.error&&tasks.data?.length)data.tasks=tasks.data.map(r=>fromDb('tasks',r)).filter(x=>x.title);
+    if(!anexos.error&&anexos.data)data.anexos=anexos.data.map(r=>fromDb('anexos',r));
+    if(!links.error&&links.data?.length)data.links=links.data.map(r=>fromDb('links',r)).filter(x=>x.title||x.url);
+    if(!chat.error&&chat.data?.length)loadSupportStatsFromRows(chat.data);
+
+    saveLocalAll();
+    renderDuvidas();renderReady();renderTutoriais();renderLinks();renderNotes();renderTasks();renderSupportInsights();
+    toast('Dados carregados do Supabase!');
   }catch(e){console.error(e);toast('Falha ao conectar no Supabase. Usando dados locais.');}
 }
 async function saveCloud(table,obj){
   if(!useSupabase)return obj;
-  const tableMap={duvidas:'duvidas',ready:'mensagens_prontas',tutoriais:'tutoriais',tasks:'tarefas',notes:'anotacoes'};
-  const db=toDb(table,obj);let res;
-  if(obj.id&&isUuid(obj.id))res=await supabaseClient.from(tableMap[table]).update(db).eq('id',obj.id).select().single();
-  else res=await supabaseClient.from(tableMap[table]).insert(db).select().single();
-  if(res.error){console.error(res.error);toast('Erro ao salvar no Supabase. Salvei localmente.');return obj;}
-  return fromDb(table,res.data);
+  const tableName=TABLES[table];
+  if(!tableName)return obj;
+  const payloads=toDbVariants(table,obj);let lastError=null;
+  for(const db of payloads){
+    let res;
+    if(obj.id&&isUuid(obj.id))res=await supabaseClient.from(tableName).update(db).eq('id',obj.id).select().single();
+    else res=await supabaseClient.from(tableName).insert(db).select().single();
+    if(!res.error)return fromDb(table,res.data);
+    lastError=res.error;
+    console.warn('Tentativa de salvar falhou em',tableName,lastError);
+  }
+  console.error(lastError);toast('Erro ao salvar no Supabase. Salvei localmente.');return obj;
 }
 async function deleteCloud(table,id){
   if(!useSupabase||!isUuid(id))return true;
-  const tableMap={duvidas:'duvidas',ready:'mensagens_prontas',tutoriais:'tutoriais',tasks:'tarefas',notes:'anotacoes'};
-  const res=await supabaseClient.from(tableMap[table]).delete().eq('id',id);
+  const tableName=TABLES[table];
+  if(!tableName)return true;
+  const res=await supabaseClient.from(tableName).delete().eq('id',id);
   if(res.error){console.error(res.error);toast('Erro ao excluir no Supabase.');return false;}
   return true;
 }
@@ -1232,19 +1270,55 @@ function getSupportStats(){
   try{return JSON.parse(localStorage.getItem(SUPPORT_STATS_KEY)||'[]')}catch(e){return []}
 }
 function saveSupportStats(stats){localStorage.setItem(SUPPORT_STATS_KEY,JSON.stringify(stats.slice(-300)));}
-function logSupportMessage(raw){
-  const stats=getSupportStats();
-  stats.push({
+function rowToSupportStat(row){
+  return {
+    id:row.id||Date.now(),
+    createdAt:firstVal(row,['created_at','criado_em'],new Date().toISOString()),
+    client:firstVal(row,['nome_cliente','cliente'],'Sem nome')||'Sem nome',
+    question:firstVal(row,['assunto_detectado','assunto'],'Outras dúvidas'),
+    risk:firstVal(row,['nivel_alerta','risco'],'baixo'),
+    preview:String(firstVal(row,['mensagem_cliente','mensagem','texto'],'')).replace(/\s+/g,' ').trim().slice(0,140)
+  };
+}
+function loadSupportStatsFromRows(rows){
+  const local=getSupportStats();
+  const incoming=(rows||[]).map(rowToSupportStat);
+  const seen=new Set();
+  const merged=[...local,...incoming].filter(item=>{const key=String(item.id||'')+'|'+String(item.createdAt||'')+'|'+String(item.preview||'');if(seen.has(key))return false;seen.add(key);return true;});
+  saveSupportStats(merged);
+}
+async function saveChatAtendimentoCloud(item,resposta){
+  if(!useSupabase)return;
+  try{
+    const payload={
+      nome_cliente:item.client==='Sem nome'?null:item.client,
+      mensagem_cliente:item.raw,
+      resposta_sugerida:resposta||'',
+      assunto_detectado:item.question,
+      nivel_alerta:item.risk,
+      palavras_detectadas:tokenizeIA(item.raw).slice(0,20)
+    };
+    const res=await supabaseClient.from('chat_atendimentos').insert(payload);
+    if(res.error)console.warn('Não salvou chat_atendimentos:',res.error);
+  }catch(e){console.warn('Falha ao salvar atendimento no Supabase:',e)}
+}
+function logSupportMessage(raw,resposta=''){
+  const item={
     id:Date.now(),
     createdAt:new Date().toISOString(),
     client:extractClientName(raw)||'Sem nome',
     question:classifyQuestion(raw),
     risk:getRiskLevel(raw),
-    preview:String(raw||'').replace(/\s+/g,' ').trim().slice(0,140)
-  });
+    preview:String(raw||'').replace(/\s+/g,' ').trim().slice(0,140),
+    raw:String(raw||'')
+  };
+  const stats=getSupportStats();
+  stats.push(item);
   saveSupportStats(stats);
   renderSupportInsights();
+  saveChatAtendimentoCloud(item,resposta);
 }
+
 function countBy(arr,key){
   return arr.reduce((acc,item)=>{const k=item[key]||'Sem nome';acc[k]=(acc[k]||0)+1;return acc;},{});
 }
@@ -1404,7 +1478,7 @@ function generateAiReply(){
   addAiBubble('user', raw);
   const reply=buildAiReply(raw);
   lastAiReply=reply;
-  logSupportMessage(raw);
+  logSupportMessage(raw,reply);
   setTimeout(()=>addAiBubble('assistant',reply),180);
   input.value='';
 }
@@ -1622,8 +1696,8 @@ function renderLinks(){
   </div>`).join(''):'<div class="library-empty"><div>Nenhum link cadastrado ainda.</div></div>';
 }
 function editLink(id){const l=(data.links||[]).find(x=>x.id===id);if(!l)return;document.getElementById('link-id').value=l.id;document.getElementById('link-title').value=l.title||'';document.getElementById('link-category').value=l.category||'Outro';document.getElementById('link-url').value=l.url||'';document.getElementById('link-desc').value=l.desc||'';document.getElementById('link-form-title').textContent='Editar link';document.getElementById('link-save-label').textContent='Salvar alteração';document.getElementById('link-cancel').style.display='inline-flex';openModal('modal-link');}
-function saveLink(){const id=document.getElementById('link-id').value||String(Date.now());const obj={id,title:document.getElementById('link-title').value.trim(),category:document.getElementById('link-category').value,url:normalizedUrl(document.getElementById('link-url').value),desc:document.getElementById('link-desc').value.trim()};if(!obj.title||!obj.url)return toast('Preencha nome e link.');const i=(data.links||[]).findIndex(x=>x.id===id);if(i>=0)data.links[i]=obj;else{data.links=data.links||[];data.links.unshift(obj)};set('links',data.links);clearLinkForm();closeModal('modal-link');renderLinks();toast('Link salvo!')}
-function deleteLink(id){if(!confirm('Excluir este link?'))return;data.links=(data.links||[]).filter(x=>x.id!==id);set('links',data.links);renderLinks();toast('Link excluído!')}
+async function saveLink(){const id=document.getElementById('link-id').value||'';let obj={id,title:document.getElementById('link-title').value.trim(),category:document.getElementById('link-category').value,url:normalizedUrl(document.getElementById('link-url').value),desc:document.getElementById('link-desc').value.trim()};if(!obj.title||!obj.url)return toast('Preencha nome e link.');obj=await saveCloud('links',obj);const i=(data.links||[]).findIndex(x=>x.id===id||x.id===obj.id);if(i>=0)data.links[i]=obj;else{data.links=data.links||[];data.links.unshift(obj)};set('links',data.links);clearLinkForm();closeModal('modal-link');renderLinks();toast('Link salvo!')}
+async function deleteLink(id){if(!confirm('Excluir este link?'))return;await deleteCloud('links',id);data.links=(data.links||[]).filter(x=>x.id!==id);set('links',data.links);renderLinks();toast('Link excluído!')}
 
 function openNote(){document.getElementById('note-text').value='';openModal('modal-note')}async function saveNote(){const text=document.getElementById('note-text').value;if(!text)return;let obj={id:'',text,date:new Date().toLocaleDateString('pt-BR')};obj=await saveCloud('notes',obj);data.notes.unshift(obj);set('notes',data.notes);closeModal('modal-note');renderNotes();toast('Anotação salva!')}function renderNotes(){const q=(document.getElementById('search-notes')?.value||'').toLowerCase();const arr=data.notes.filter(n=>n.text.toLowerCase().includes(q));document.getElementById('notes-container').innerHTML=arr.length?arr.map(n=>`<div class="card item-card"><span class="badge badge-gray">${n.date}</span><p>${esc(n.text)}</p><div class="item-footer"><button class="btn btn-danger" onclick="del('notes','${n.id}')">Excluir</button></div></div>`).join(''):'<div class="card muted">Nenhuma anotação.</div>'}
 function normalizeTasks(){
