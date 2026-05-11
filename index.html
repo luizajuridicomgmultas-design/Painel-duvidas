@@ -647,18 +647,19 @@ main{
 }
 
 
-    /* --- AJUSTE: MINI CHAT MENOR E SEM REGRAS DA IA --- */
+    /* --- AJUSTE: CHAT MAIS ESTREITO E ALTO, TIPO CELULAR --- */
     #tab-ia .page-head{padding:18px 22px!important;margin-bottom:14px!important}
     #tab-ia .page-head h1{font-size:1.48rem!important}
     #tab-ia .page-head p{font-size:.86rem!important}
-    #tab-ia .ai-layout{grid-template-columns:minmax(0,1fr) 260px!important;gap:14px!important}
+    #tab-ia .ai-layout{grid-template-columns:390px minmax(240px,1fr)!important;gap:18px!important;align-items:start!important}
+    #tab-ia .ai-chat-card{max-width:390px!important;width:100%!important;justify-self:start!important}
     #tab-ia .ai-chat-head{padding:14px 16px!important}
     #tab-ia .ai-chat-head strong{font-size:.95rem!important}
     #tab-ia .ai-chat-head span{font-size:.74rem!important}
-    #tab-ia .ai-chat-log{height:235px!important;padding:12px!important;gap:9px!important}
-    #tab-ia .ai-bubble{font-size:.82rem!important;line-height:1.42!important;padding:10px 11px!important}
+    #tab-ia .ai-chat-log{height:430px!important;padding:12px!important;gap:9px!important}
+    #tab-ia .ai-bubble{font-size:.82rem!important;line-height:1.45!important;padding:10px 11px!important}
     #tab-ia .ai-composer{padding:11px!important}
-    #tab-ia .ai-input{min-height:76px!important;max-height:130px!important;font-size:14px!important;border-radius:13px!important}
+    #tab-ia .ai-input{min-height:92px!important;max-height:150px!important;font-size:14px!important;border-radius:13px!important}
     #tab-ia .ai-composer-actions{grid-template-columns:1fr 1fr auto!important;gap:7px!important;margin-top:8px!important}
     #tab-ia .ai-composer-actions .btn{min-height:34px!important;font-size:.74rem!important}
     #tab-ia .ai-side{gap:0!important}
@@ -668,8 +669,9 @@ main{
     #tab-ia .ai-example{font-size:.76rem!important;padding:8px 9px!important;border-radius:11px!important}
     @media(max-width:860px){
       #tab-ia .ai-layout{grid-template-columns:1fr!important;gap:10px!important}
-      #tab-ia .ai-chat-log{height:210px!important}
-      #tab-ia .ai-input{min-height:82px!important;font-size:16px!important}
+      #tab-ia .ai-chat-card{max-width:410px!important;justify-self:center!important}
+      #tab-ia .ai-chat-log{height:360px!important}
+      #tab-ia .ai-input{min-height:92px!important;font-size:16px!important}
       #tab-ia .ai-composer-actions{grid-template-columns:1fr 1fr!important}
       #tab-ia .ai-composer-actions .btn:nth-child(3){grid-column:span 2!important}
       #tab-ia .ai-side .card{padding:12px!important}
@@ -1218,19 +1220,72 @@ function addAiBubble(role,text){
   const div=document.createElement('div'); div.className=`ai-bubble ${role}`; div.textContent=text;
   log.appendChild(div); log.scrollTop=log.scrollHeight;
 }
-function generateAiReply(){
-  const input=document.getElementById('ai-input'); if(!input)return;
-  const raw=input.value.trim(); if(!raw)return toast('Cole a mensagem da cliente primeiro.');
+async function generateAiReply(){
+  const input=document.getElementById('ai-input');
+  if(!input)return;
+
+  const raw=input.value.trim();
+  if(!raw)return toast('Cole a mensagem da cliente primeiro.');
+
   addAiBubble('user', raw);
-  lastAiReply=buildAiReply(raw);
-  setTimeout(()=>addAiBubble('assistant', lastAiReply),180);
+  addAiBubble('assistant', 'Gerando resposta com IA...');
   input.value='';
+
+  try{
+    const basePortal={
+      duvidas:data.duvidas||[],
+      mensagensProntas:data.ready||[],
+      tutoriais:data.tutoriais||[],
+      links:data.links||[]
+    };
+
+    const response=await fetch('/api/gemini-atendimento',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({mensagemCliente:raw,basePortal})
+    });
+
+    const result=await response.json();
+
+    const log=document.getElementById('ai-chat-log');
+    const bubbles=log?.querySelectorAll('.ai-bubble.assistant');
+    const loading=bubbles?.[bubbles.length-1];
+    if(loading&&loading.textContent==='Gerando resposta com IA...')loading.remove();
+
+    if(!response.ok){
+      toast(result.error||'Erro ao gerar resposta. Usei a resposta automática.');
+      const fallback=buildAiReply(raw);
+      lastAiReply=fallback;
+      addAiBubble('assistant',fallback);
+      return;
+    }
+
+    lastAiReply=result.resposta||'';
+    addAiBubble('assistant',lastAiReply||'Não consegui gerar uma resposta agora.');
+  }catch(err){
+    console.error(err);
+    const log=document.getElementById('ai-chat-log');
+    const bubbles=log?.querySelectorAll('.ai-bubble.assistant');
+    const loading=bubbles?.[bubbles.length-1];
+    if(loading&&loading.textContent==='Gerando resposta com IA...')loading.remove();
+
+    toast('Erro ao conectar com a IA. Usei a resposta automática.');
+    const fallback=buildAiReply(raw);
+    lastAiReply=fallback;
+    addAiBubble('assistant',fallback);
+  }
 }
 function copyAiReply(){
   if(!lastAiReply)return toast('Gere uma resposta primeiro.');
-  const clean=lastAiReply
-    .replace(/^Recomendo responder assim:\n\n/i,'')
-    .replace(/\n\nObservação interna:[\s\S]*$/i,'')
+  const clean=String(lastAiReply)
+    .replace(/^Recomendo responder assim:
+
+/i,'')
+    .replace(/^Resposta sugerida:\s*/i,'')
+    .replace(/
+
+Observação interna:[\s\S]*$/i,'')
+    .replace(/Observação interna:[\s\S]*$/i,'')
     .trim();
   copy(clean);
 }
