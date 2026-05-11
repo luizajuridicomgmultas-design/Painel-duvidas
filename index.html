@@ -1156,36 +1156,62 @@ function personalizeReadyAnswer(text,nome){
   }
   return resposta;
 }
+function humanizePortalAnswer(found,nome,raw){
+  const text=normalizeTextIA(raw);
+  const title=normalizeTextIA(found?.title||'');
+  const oi=nome?`Olá, ${nome}.`:'Olá.';
+
+  if(/prazo|dias uteis|fora prazo|fora do prazo/.test(`${title} ${text}`)){
+    return `${oi}\n\nVocê enviou que dia?\n\nO servidor deve solicitar a perícia em até 2 dias úteis após o início do afastamento.\n\nSábado, domingo, feriados e pontos facultativos não contam como dia útil para protocolo.\n\nEntão, se ainda não enviamos o protocolo para você, é porque a perícia ainda não respondeu, e esse pode ser um dos motivos.\n\nSe você acha que não foi esse o caso, pode nos explicar aqui que verificamos melhor.`;
+  }
+
+  if(/protocolo|retorno|status|acompanhar/.test(text)){
+    return `${oi}\n\nAinda não tivemos retorno da perícia sobre essa solicitação.\n\nAssim que o órgão responder, enviamos o protocolo ou a orientação recebida para você.\n\nSó reforçando que esse prazo de resposta não depende do Atestado Fácil, porque quem analisa é o órgão responsável.\n\nSe quiser, me envie a data do envio para eu conferir melhor.`;
+  }
+
+  if(/ilegivel|documento|anexo|foto|borrad|cortad|incorreta|errado/.test(text)){
+    return `${oi}\n\nA perícia informou que o documento não foi aceito ou não ficou legível.\n\nVocê consegue enviar novamente em uma foto mais nítida, sem corte, sombra ou parte borrada?\n\nCom o documento correto, conseguimos orientar o novo envio com mais segurança.`;
+  }
+
+  if(/prefeitura|oficial|golpe|confiavel|seguro|verdade/.test(text)){
+    return `${oi}\n\nEntendo sua preocupação.\n\nO Atestado Fácil não é um app da Prefeitura. É uma ferramenta independente, criada para facilitar o preenchimento e envio do formulário de perícia médica por e-mail.\n\nA gente ajuda com o envio e acompanha o e-mail até a resposta do órgão, mas não temos vínculo oficial com a Prefeitura.`;
+  }
+
+  return personalizeReadyAnswer(found.content,nome);
+}
+
 function buildAiReply(raw){
   const text=normalizeTextIA(raw);
   const nome=extractClientName(raw);
   const oi=nome?`Olá, ${nome}.`:'Olá.';
   const found=findPortalAnswer(raw);
+
   if(found){
-    const resposta=personalizeReadyAnswer(found.content,nome);
-    return `Recomendo responder assim:\n\n${resposta}\n\nObservação interna: encontrei uma resposta parecida em "${found.title||'sem título'}" (${found.origem}). Revise antes de enviar.`;
+    const resposta=humanizePortalAnswer(found,nome,raw);
+    return `Recomendo responder assim:\n\n${resposta}\n\nObservação interna: encontrei uma resposta parecida em "${found.title||'sem título'}" (${found.origem}) e deixei em tom mais humano para WhatsApp. Revise antes de enviar.`;
   }
+
   let resposta='';
   if(/prefeitura|oficial|golpe|confiavel|seguro|verdade/.test(text)){
-    resposta=`${oi} Não somos um app da Prefeitura.\n\nO Atestado Fácil é uma ferramenta independente, criada para facilitar o preenchimento e envio do formulário de perícia médica por e-mail.\n\nAtuamos apenas no apoio ao envio, sem vínculo com órgão público.`;
+    resposta=`${oi}\n\nEntendo sua preocupação.\n\nO Atestado Fácil não é um app da Prefeitura. É uma ferramenta independente, criada para facilitar o preenchimento e envio do formulário de perícia médica por e-mail.\n\nA gente ajuda com o envio e acompanha o e-mail até a resposta do órgão, mas não temos vínculo oficial com a Prefeitura.`;
   }else if(/protocolo|nao chegou|retorno|resposta do orgao|status|acompanhar|consulta/.test(text)){
-    resposta=`${oi} Sua solicitação fica sendo acompanhada pelo e-mail até o retorno do órgão.\n\nAssim que houver resposta, encaminhamos o protocolo ou a orientação recebida para você.\n\nSó reforçando que o prazo de resposta depende do órgão responsável.`;
+    resposta=`${oi}\n\nVocê enviou que dia?\n\nSe ainda não enviamos o protocolo para você, é porque a perícia ainda não respondeu.\n\nAssim que houver retorno do órgão, encaminhamos o protocolo ou a orientação recebida.\n\nSó lembrando que o prazo de resposta depende da perícia, não do Atestado Fácil.`;
   }else if(/fora do prazo|atrasad|perdi o prazo|prazo/.test(text)){
-    resposta=`${oi} Quando a solicitação é enviada fora do prazo, o órgão pode recusar ou solicitar alguma correção.\n\nO Atestado Fácil auxilia no preenchimento e envio por e-mail, mas a análise é feita pelo órgão responsável.\n\nMe envie o print do retorno para verificarmos a melhor orientação.`;
+    resposta=`${oi}\n\nVocê pode me dizer a data de início do afastamento e a data em que enviou?\n\nO servidor deve solicitar a perícia em até 2 dias úteis após o início do afastamento.\n\nSábado, domingo, feriados e pontos facultativos não contam como dia útil para protocolo.\n\nCom essas datas, consigo te orientar melhor.`;
   }else if(/ilegivel|documento|anexo|foto|borrad|cortad|incorreta|errado/.test(text)){
-    resposta=`${oi} Nesse caso, o ideal é reenviar o documento em uma foto mais nítida, sem cortes, sombras ou partes borradas.\n\nDocumento ilegível ou incorreto pode prejudicar a análise do órgão.\n\nPode me enviar o print da resposta ou o documento correto para conferirmos?`;
+    resposta=`${oi}\n\nA perícia informou que o documento não foi aceito ou não ficou legível.\n\nVocê consegue enviar novamente em uma foto mais nítida, sem corte, sombra ou parte borrada?\n\nSe puder, me envie também o print da resposta que apareceu.`;
   }else if(/erro|nao abre|trav|bug|nao consigo|falha|tela branca/.test(text)){
-    resposta=`${oi} Me envie um print ou uma gravação rápida da tela onde aparece o erro, por favor.\n\nTambém tente fechar e abrir o app novamente.\n\nSe continuar, verificamos o que pode estar acontecendo e te orientamos.`;
+    resposta=`${oi}\n\nMe manda um print da tela onde aparece o erro, por favor?\n\nSe conseguir, tente também fechar e abrir o app novamente.\n\nCom o print eu consigo entender melhor o que aconteceu e te orientar.`;
   }else if(/pagamento|pix|comprovante|comprar|adquirir|valor|pagar/.test(text)){
-    resposta=`${oi} Para liberar o acesso, precisamos confirmar os dados e o pagamento.\n\nO acesso é individual e vinculado aos dados cadastrados.\n\nMe envie o comprovante para seguirmos com a liberação do código.`;
+    resposta=`${oi}\n\nMe envie o comprovante, por favor.\n\nAssim que conferirmos, seguimos com a liberação do seu código de acesso.\n\nLembrando que o acesso é individual e fica vinculado aos dados cadastrados.`;
   }else if(/codigo|acesso|nao funciona|bloqueado|vencido|renovar|renovacao/.test(text)){
-    resposta=`${oi} Podemos verificar a situação do seu acesso.\n\nMe envie o nome completo ou o código usado no app para conferirmos e te passar a orientação correta.`;
+    resposta=`${oi}\n\nMe envie o nome completo ou o código que você está tentando usar.\n\nVou conferir a situação do acesso e te digo certinho o que precisa ser feito.`;
   }else if(/excluir|apagar|remover dados|meus dados|lgpd/.test(text)){
-    resposta=`${oi} Você pode solicitar a exclusão dos seus dados pelo suporte.\n\nEnvie a solicitação informando nome completo e telefone cadastrado para: suportenexalab@gmail.com.\n\nApós a conferência, seguimos com a orientação adequada.`;
+    resposta=`${oi}\n\nTudo bem. Para solicitar a exclusão dos seus dados, envie um e-mail para: suportenexalab@gmail.com\n\nNo e-mail, informe seu nome completo e telefone cadastrado para conseguirmos localizar corretamente.`;
   }else{
-    resposta=`${oi} Entendi. Para te orientar com segurança, me envie um print da mensagem ou mais detalhes do que apareceu.\n\nO Atestado Fácil ajuda no preenchimento e envio por e-mail do formulário, mas não temos vínculo com a Prefeitura nem controle sobre a análise do órgão.`;
+    resposta=`${oi}\n\nEntendi. Me envie um print da mensagem ou mais detalhes do que apareceu, por favor.\n\nAssim consigo te orientar com mais segurança.\n\nSó reforçando que o Atestado Fácil ajuda no preenchimento e envio por e-mail, mas a análise e resposta são feitas pelo órgão responsável.`;
   }
-  return `Recomendo responder assim:\n\n${resposta}\n\nObservação interna: não encontrei uma resposta cadastrada igual no portal, então usei uma regra segura. Se essa dúvida aparecer sempre, cadastre uma dúvida pronta para melhorar a sugestão.`;
+  return `Recomendo responder assim:\n\n${resposta}\n\nObservação interna: não encontrei uma resposta cadastrada igual no portal, então usei uma regra segura e em tom de WhatsApp. Se essa dúvida aparecer sempre, cadastre uma dúvida pronta para melhorar a sugestão.`;
 }
 function addAiBubble(role,text){
   const log=document.getElementById('ai-chat-log'); if(!log)return;
