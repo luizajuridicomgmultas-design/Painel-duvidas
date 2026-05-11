@@ -836,7 +836,7 @@ Mensagem dela: O app não está abrindo no meu celular.')">Erro no app</button>
     <div class="field"><label>Título</label><input id="tutorial-title" class="control" placeholder="Título do tutorial"></div>
     <div class="field"><label>Descrição</label><input id="tutorial-desc" class="control" placeholder="Descrição opcional"></div>
     <div class="field"><label>Conteúdo ou link</label><textarea id="tutorial-content" class="control" placeholder="Digite o passo a passo do tutorial..."></textarea></div>
-    <div class="field"><label style="font-size:12px;color:var(--muted);font-weight:600">Anexo opcional</label><input type="file" id="tutorial-file" class="control"></div>
+    <div class="field"><label style="font-size:12px;color:var(--muted);font-weight:600">Anexo opcional</label><input type="file" id="tutorial-file" class="control" accept="application/pdf,image/*,video/*"></div>
     <div class="modal-actions"><button id="tutorial-cancel" class="btn btn-secondary" onclick="cancelTutorialEdit()">Cancelar</button><button class="btn btn-primary" onclick="saveTutorial()"><svg class="icon"><use href="#i-plus"></use></svg><span id="tutorial-save-label">Adicionar tutorial</span></button></div>
   </div></div>
 
@@ -1039,12 +1039,18 @@ async function uploadTutorialFile(itemId){
   if(!file||!useSupabase||!isUuid(itemId))return;
   const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
   const path=`tutoriais/${itemId}/${Date.now()}-${safeName}`;
-  const up=await supabaseClient.storage.from('anexos').upload(path,file,{upsert:false});
+  const up=await supabaseClient.storage.from('tutoriais').upload(path,file,{upsert:false});
   if(up.error){console.error(up.error);toast('Tutorial salvo, mas o anexo não subiu.');return;}
-  const publicData=supabaseClient.storage.from('anexos').getPublicUrl(path);
+  const publicData=supabaseClient.storage.from('tutoriais').getPublicUrl(path);
   const url=publicData.data.publicUrl;
   const reg=await supabaseClient.from('anexos').insert({tabela_origem:'tutoriais',item_id:itemId,nome_arquivo:file.name,caminho_arquivo:path,url_publica:url,tipo_arquivo:file.type}).select().single();
-  if(reg.error){console.error(reg.error);toast('Anexo enviado, mas não registrou no banco.');return;}
+  if(reg.error){
+    console.error(reg.error);
+    const localAnexo={id:'local-'+Date.now(),item_id:itemId,nome_arquivo:file.name,caminho_arquivo:path,url_publica:url,tipo_arquivo:file.type};
+    data.anexos.unshift(localAnexo);set('anexos',data.anexos);input.value='';
+    toast('Anexo enviado. Para aparecer em outros aparelhos, crie a tabela anexos.');
+    return;
+  }
   data.anexos.unshift(fromDb('anexos',reg.data));set('anexos',data.anexos);input.value='';toast('Anexo salvo!');
 }
 
@@ -1270,6 +1276,77 @@ function openReady(){document.getElementById('ready-id').value='';document.getEl
 function editReady(id){const r=data.ready.find(x=>x.id===id);if(!r)return;document.getElementById('ready-id').value=r.id;document.getElementById('ready-title').value=r.title;document.getElementById('ready-text').value=r.text;document.getElementById('ready-modal-title').textContent='Editar mensagem pronta';openModal('modal-ready')}
 async function saveReady(){const id=document.getElementById('ready-id').value||'';let obj={id,title:document.getElementById('ready-title').value,text:document.getElementById('ready-text').value};if(!obj.title||!obj.text)return toast('Preencha título e mensagem.');obj=await saveCloud('ready',obj);const i=data.ready.findIndex(x=>x.id===id||x.id===obj.id);i>=0?data.ready[i]=obj:data.ready.unshift(obj);set('ready',data.ready);closeModal('modal-ready');renderReady();toast('Mensagem salva!')}
 
+
+function cleanDownloadName(name){
+  return String(name||'tutorial')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-zA-Z0-9._ -]/g,'')
+    .replace(/\s+/g,'-')
+    .toLowerCase();
+}
+function extensionFromUrlOrMime(url,mime=''){
+  const clean=String(url||'').split('?')[0].toLowerCase();
+  const known=['.pdf','.png','.jpg','.jpeg','.webp','.gif','.mp4','.mov','.webm','.avi'];
+  for(const ext of known){ if(clean.endsWith(ext)) return ext; }
+  const m=String(mime||'').toLowerCase();
+  if(m.includes('pdf'))return '.pdf';
+  if(m.includes('png'))return '.png';
+  if(m.includes('jpeg')||m.includes('jpg'))return '.jpg';
+  if(m.includes('webp'))return '.webp';
+  if(m.includes('gif'))return '.gif';
+  if(m.includes('mp4'))return '.mp4';
+  if(m.includes('quicktime'))return '.mov';
+  if(m.includes('webm'))return '.webm';
+  if(m.includes('video'))return '.mp4';
+  return '';
+}
+function isDownloadableTutorialUrl(url,mime=''){
+  const u=String(url||'').split('?')[0].toLowerCase();
+  const m=String(mime||'').toLowerCase();
+  return /\.(pdf|png|jpe?g|webp|gif|mp4|mov|webm|avi)$/i.test(u) || m.includes('pdf') || m.includes('image') || m.includes('video');
+}
+async function baixarTutorial(url,nome='tutorial',mime=''){
+  const finalUrl=normalizedUrl(url);
+  if(!finalUrl)return toast('Nenhum arquivo encontrado para baixar.');
+  try{
+    const response=await fetch(finalUrl,{mode:'cors'});
+    if(!response.ok)throw new Error('Falha ao baixar');
+    const blob=await response.blob();
+    const ext=extensionFromUrlOrMime(finalUrl,blob.type||mime);
+    const blobUrl=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=blobUrl;
+    a.download=cleanDownloadName(nome)+ext;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(blobUrl),1200);
+    toast('Download iniciado.');
+  }catch(err){
+    console.warn('Download direto não funcionou, abrindo em nova aba:',err);
+    const a=document.createElement('a');
+    a.href=finalUrl;
+    a.target='_blank';
+    a.rel='noopener noreferrer';
+    a.download=cleanDownloadName(nome)+extensionFromUrlOrMime(finalUrl,mime);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    toast('Abrindo arquivo para baixar.');
+  }
+}
+function firstTutorialAttachment(t){
+  const att=attachmentsFor(t.id);
+  return att && att.length ? att[0] : null;
+}
+function tutorialDownloadUrl(t){
+  const att=firstTutorialAttachment(t);
+  if(att?.url_publica)return {url:att.url_publica,name:att.nome_arquivo||t.title,mime:att.tipo_arquivo||''};
+  if(t.type!=='texto' && isDownloadableTutorialUrl(t.content))return {url:t.content,name:t.title,mime:''};
+  return null;
+}
+
 function openTutorialModal(){clearTutorialForm();document.getElementById('tutorial-modal-title').textContent='Novo tutorial';openModal('modal-tutorial')}
 function setTutorialType(type){document.getElementById('tutorial-type').value=type;['texto','link','video'].forEach(t=>document.getElementById('seg-'+t).classList.toggle('active',t===type));const c=document.getElementById('tutorial-content');if(type==='texto'){c.placeholder='Digite o passo a passo do tutorial...';c.rows=7}else if(type==='link'){c.placeholder='https://... (YouTube, PDF, página)';c.rows=4}else{c.placeholder='Cole o link do vídeo (YouTube, Drive, Loom etc.)';c.rows=4}}
 async function saveTutorial(){const id=document.getElementById('tutorial-id').value||'';let obj={id,type:document.getElementById('tutorial-type').value,title:document.getElementById('tutorial-title').value,desc:document.getElementById('tutorial-desc').value,content:document.getElementById('tutorial-content').value};if(!obj.title||!obj.content)return toast('Preencha título e conteúdo/link.');obj=await saveCloud('tutoriais',obj);const i=data.tutoriais.findIndex(x=>x.id===id||x.id===obj.id);i>=0?data.tutoriais[i]=obj:data.tutoriais.unshift(obj);set('tutoriais',data.tutoriais);await uploadTutorialFile(obj.id);clearTutorialForm();closeModal('modal-tutorial');renderTutoriais();toast('Tutorial salvo!')}
@@ -1282,25 +1359,37 @@ function renderTutoriais(){
   const html=arr.length?`<div class="tutorial-list">${arr.map(t=>{
     const badge=t.type==='texto'?'badge-green':t.type==='video'?'badge-orange':'badge-blue';
     const preview=t.type==='texto'?t.content:t.content;
+    const anexos=attachmentsFor(t.id);
+    const download=tutorialDownloadUrl(t);
     return `<div class="tutorial-row">
       <div style="min-width:0">
         <span class="badge ${badge}">${esc(t.type)}</span>
         <h3>${esc(t.title)}</h3>
         ${t.desc?`<p class="desc">${esc(t.desc)}</p>`:''}
         <div class="tutorial-preview">${esc(preview)}</div>
-        ${attachmentsFor(t.id).length?`<div class="tutorial-preview" style="margin-top:8px"><strong>Anexos:</strong> ${attachmentsFor(t.id).map(a=>`<a href="${esc(a.url_publica)}" target="_blank">${esc(a.nome_arquivo)}</a>`).join(' · ')}</div>`:''}
+        ${anexos.length?`<div class="tutorial-preview" style="margin-top:8px"><strong>Anexos:</strong> ${anexos.map(a=>`<span style="display:inline-flex;gap:6px;align-items:center;margin:3px 8px 3px 0"><a href="${esc(a.url_publica)}" target="_blank">${esc(a.nome_arquivo)}</a><button class="btn btn-secondary" style="min-height:26px;padding:4px 7px;font-size:.68rem" onclick="baixarTutorial('${js(a.url_publica)}','${js(a.nome_arquivo||t.title)}','${js(a.tipo_arquivo||'')}')">${svg('i-file')}Baixar</button></span>`).join('')}</div>`:''}
       </div>
       <div class="actions">
         <button class="btn btn-secondary" onclick="viewTutorial('${t.id}')">${svg('i-eye')}Ver</button>
         <button class="btn btn-secondary" onclick="editTutorial('${t.id}')">${svg('i-edit')}Editar</button>
-        ${t.type==='texto'?`<button class="btn btn-secondary" onclick="copy(\`${js(t.content)}\`)">${svg('i-copy')}Copiar</button>`:`<a class="btn btn-secondary" href="${esc(t.content)}" target="_blank">${svg('i-link')}Abrir</a>`}
+        ${t.type==='texto'?`<button class="btn btn-secondary" onclick="copy(\`${js(t.content)}\`)">${svg('i-copy')}Copiar</button>`:`<a class="btn btn-secondary" href="${esc(normalizedUrl(t.content))}" target="_blank">${svg('i-link')}Abrir</a>`}
+        ${download?`<button class="btn btn-secondary" onclick="baixarTutorial('${js(download.url)}','${js(download.name||t.title)}','${js(download.mime||'')}')">${svg('i-file')}Baixar</button>`:''}
         <button class="btn btn-danger" onclick="del('tutoriais','${t.id}')">${svg('i-trash')}</button>
       </div>
     </div>`
-  }).join('')}</div>`:'<div class="library-empty"><div>Nenhum tutorial ainda. Adicione textos, links ou vídeos.</div></div>';
+  }).join('')}</div>`:'<div class="library-empty"><div>Nenhum tutorial ainda. Adicione textos, links, vídeos, PDFs ou imagens.</div></div>';
   document.getElementById('tutoriais-container').innerHTML=html;
 }
-function viewTutorial(id){const t=data.tutoriais.find(x=>x.id===id);if(!t)return;document.getElementById('view-title').textContent=t.title;document.getElementById('view-content').innerHTML=`<span class="badge badge-blue">${esc(t.type)}</span>${t.desc?`<p style="margin:12px 0;color:var(--ink)">${esc(t.desc)}</p>`:''}<div style="margin-top:14px;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap">${esc(t.content)}</div>`;document.getElementById('view-actions').innerHTML=t.type==='texto'?`<button class="btn btn-primary" onclick="copy(\`${js(t.content)}\`)">${svg('i-copy')}Copiar</button>`:`<a class="btn btn-primary" href="${esc(t.content)}" target="_blank">${svg('i-link')}Abrir link</a>`;openModal('modal-view')}
+function viewTutorial(id){
+  const t=data.tutoriais.find(x=>x.id===id);
+  if(!t)return;
+  const anexos=attachmentsFor(t.id);
+  const download=tutorialDownloadUrl(t);
+  document.getElementById('view-title').textContent=t.title;
+  document.getElementById('view-content').innerHTML=`<span class="badge badge-blue">${esc(t.type)}</span>${t.desc?`<p style="margin:12px 0;color:var(--ink)">${esc(t.desc)}</p>`:''}<div style="margin-top:14px;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap">${esc(t.content)}</div>${anexos.length?`<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px"><strong style="color:var(--ink)">Anexos:</strong><div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${anexos.map(a=>`<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><a class="btn btn-secondary" href="${esc(a.url_publica)}" target="_blank">${svg('i-link')}Abrir ${esc(a.nome_arquivo)}</a><button class="btn btn-primary" onclick="baixarTutorial('${js(a.url_publica)}','${js(a.nome_arquivo||t.title)}','${js(a.tipo_arquivo||'')}')">${svg('i-file')}Baixar</button></div>`).join('')}</div></div>`:''}`;
+  document.getElementById('view-actions').innerHTML=t.type==='texto'?`<button class="btn btn-primary" onclick="copy(\`${js(t.content)}\`)">${svg('i-copy')}Copiar</button>`:`<a class="btn btn-secondary" href="${esc(normalizedUrl(t.content))}" target="_blank">${svg('i-link')}Abrir link</a>${download?`<button class="btn btn-primary" onclick="baixarTutorial('${js(download.url)}','${js(download.name||t.title)}','${js(download.mime||'')}')">${svg('i-file')}Baixar tutorial</button>`:''}`;
+  openModal('modal-view');
+}
 function editTutorial(id){const t=data.tutoriais.find(x=>x.id===id);if(!t)return;document.getElementById('tutorial-id').value=t.id;setTutorialType(t.type);document.getElementById('tutorial-title').value=t.title;document.getElementById('tutorial-desc').value=t.desc||'';document.getElementById('tutorial-content').value=t.content;document.getElementById('tutorial-save-label').textContent='Salvar alteração';document.getElementById('tutorial-modal-title').textContent='Editar tutorial';openModal('modal-tutorial')}
 
 
