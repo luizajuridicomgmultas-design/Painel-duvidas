@@ -411,6 +411,272 @@ main{margin:0!important;width:100%!important;max-width:1180px!important;padding:
       .tutorial-row .actions .btn,.link-card .actions .btn{width:100%;justify-content:center}
     }
 
+  
+
+/* =========================================================
+   AJUSTE FINAL — MENU FIXO, SEM DRAWER ESCONDIDO
+   Mantém o menu sempre visível no PC e no celular.
+   ========================================================= */
+.app-topbar,
+.sidebar-backdrop{
+  display:none !important;
+}
+
+body{
+  display:block !important;
+  min-height:100vh;
+  background:#F6F9FF !important;
+  overflow-x:hidden;
+}
+
+#sidebar{
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  bottom:0 !important;
+  width:232px !important;
+  height:100vh !important;
+  transform:none !important;
+  background:#FFFFFF !important;
+  border-right:1px solid #DCE7FA !important;
+  box-shadow:none !important;
+  z-index:40 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  padding:0 !important;
+  overflow:hidden !important;
+}
+
+body.sidebar-open #sidebar{
+  transform:none !important;
+}
+
+#sidebar .brand{
+  display:flex !important;
+  padding:18px 16px !important;
+  border-bottom:1px solid #E6EFFD !important;
+  gap:10px !important;
+}
+
+.brand-icon{
+  width:36px !important;
+  height:36px !important;
+  border-radius:12px !important;
+  background:#2563EB !important;
+  box-shadow:none !important;
+}
+
+.brand-title{
+  font-size:.98rem !important;
+  font-weight:850 !important;
+}
+
+.brand-sub{
+  font-size:.7rem !important;
+}
+
+#sidebar .profile{
+  display:none !important;
+}
+
+.nav-list{
+  display:flex !important;
+  flex-direction:column !important;
+  grid-template-columns:none !important;
+  gap:6px !important;
+  padding:14px 12px !important;
+  height:auto !important;
+  overflow-y:auto !important;
+  flex:1 !important;
+}
+
+.nav-item{
+  min-height:42px !important;
+  height:auto !important;
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:10px !important;
+  padding:10px 12px !important;
+  border-radius:13px !important;
+  font-size:.86rem !important;
+  font-weight:750 !important;
+  line-height:1 !important;
+  text-align:left !important;
+  white-space:nowrap !important;
+  color:#52677F !important;
+}
+
+.nav-item .icon{
+  width:18px !important;
+  height:18px !important;
+  margin:0 !important;
+  flex:0 0 auto !important;
+}
+
+.nav-item:hover{
+  background:#F3F7FF !important;
+  color:#2563EB !important;
+}
+
+.nav-item.active{
+  background:#2563EB !important;
+  color:#FFFFFF !important;
+  box-shadow:0 8px 18px rgba(37,99,235,.16) !important;
+}
+
+main{
+  margin-left:232px !important;
+  width:calc(100% - 232px) !important;
+  max-width:none !important;
+  padding:22px 24px 34px !important;
+}
+
+.page-head{
+  margin-bottom:16px !important;
+  border-radius:22px !important;
+  padding:20px 22px !important;
+}
+
+.page-head h1{
+  font-size:1.52rem !important;
+}
+
+.page-head p{
+  font-size:.86rem !important;
+  max-width:680px !important;
+}
+
+/* Celular: menu continua visível, mas vira uma barra lateral compacta. */
+@media(max-width:760px){
+  body{
+    padding-bottom:0 !important;
+  }
+
+  #sidebar{
+    width:76px !important;
+    height:100vh !important;
+    top:0 !important;
+    bottom:0 !important;
+    right:auto !important;
+    border-right:1px solid #DCE7FA !important;
+    border-top:0 !important;
+    box-shadow:6px 0 18px rgba(15,23,42,.05) !important;
+    overflow-y:auto !important;
+  }
+
+  #sidebar .brand{
+    display:flex !important;
+    justify-content:center !important;
+    padding:12px 6px !important;
+  }
+
+  #sidebar .brand > div:last-child{
+    display:none !important;
+  }
+
+  .brand-icon{
+    width:40px !important;
+    height:40px !important;
+    border-radius:14px !important;
+  }
+
+  .nav-list{
+    padding:10px 6px !important;
+    gap:7px !important;
+    display:flex !important;
+    flex-direction:column !important;
+  }
+
+  .nav-item{
+    min-height:56px !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:4px !important;
+    padding:7px 4px !important;
+    border-radius:15px !important;
+    font-size:.58rem !important;
+    line-height:1.05 !important;
+    text-align:center !important;
+    white-space:normal !important;
+  }
+
+  .nav-item .icon{
+    width:19px !important;
+    height:19px !important;
+  }
+
+  main{
+    margin-left:76px !important;
+    width:calc(100% - 76px) !important;
+    padding:10px 9px 18px !important;
+  }
+
+  .page-head{
+    border-radius:18px !important;
+    padding:14px !important;
+    margin-bottom:10px !important;
+  }
+
+  .page-head h1{
+    font-size:1.18rem !important;
+  }
+
+  .page-head p{
+    font-size:.76rem !important;
+    line-height:1.32 !important;
+    display:-webkit-box !important;
+    -webkit-line-clamp:2 !important;
+    -webkit-box-orient:vertical !important;
+    overflow:hidden !important;
+  }
+
+  .page-head .pill,
+  .page-head .btn{
+    min-height:36px !important;
+    margin-top:8px !important;
+    font-size:.72rem !important;
+  }
+
+  .card{
+    border-radius:15px !important;
+    padding:12px !important;
+  }
+}
+
+
+    /* --- AJUSTE: MINI CHAT MENOR E SEM REGRAS DA IA --- */
+    #tab-ia .page-head{padding:18px 22px!important;margin-bottom:14px!important}
+    #tab-ia .page-head h1{font-size:1.48rem!important}
+    #tab-ia .page-head p{font-size:.86rem!important}
+    #tab-ia .ai-layout{grid-template-columns:minmax(0,1fr) 260px!important;gap:14px!important}
+    #tab-ia .ai-chat-head{padding:14px 16px!important}
+    #tab-ia .ai-chat-head strong{font-size:.95rem!important}
+    #tab-ia .ai-chat-head span{font-size:.74rem!important}
+    #tab-ia .ai-chat-log{height:235px!important;padding:12px!important;gap:9px!important}
+    #tab-ia .ai-bubble{font-size:.82rem!important;line-height:1.42!important;padding:10px 11px!important}
+    #tab-ia .ai-composer{padding:11px!important}
+    #tab-ia .ai-input{min-height:76px!important;max-height:130px!important;font-size:14px!important;border-radius:13px!important}
+    #tab-ia .ai-composer-actions{grid-template-columns:1fr 1fr auto!important;gap:7px!important;margin-top:8px!important}
+    #tab-ia .ai-composer-actions .btn{min-height:34px!important;font-size:.74rem!important}
+    #tab-ia .ai-side{gap:0!important}
+    #tab-ia .ai-side .card{padding:13px!important;border-radius:18px!important}
+    #tab-ia .ai-side h2{font-size:.95rem!important;margin-bottom:8px!important}
+    #tab-ia .ai-examples{gap:7px!important;margin-top:8px!important}
+    #tab-ia .ai-example{font-size:.76rem!important;padding:8px 9px!important;border-radius:11px!important}
+    @media(max-width:860px){
+      #tab-ia .ai-layout{grid-template-columns:1fr!important;gap:10px!important}
+      #tab-ia .ai-chat-log{height:210px!important}
+      #tab-ia .ai-input{min-height:82px!important;font-size:16px!important}
+      #tab-ia .ai-composer-actions{grid-template-columns:1fr 1fr!important}
+      #tab-ia .ai-composer-actions .btn:nth-child(3){grid-column:span 2!important}
+      #tab-ia .ai-side .card{padding:12px!important}
+      #tab-ia .ai-examples{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important}
+      #tab-ia .ai-example{width:100%!important}
+    }
+
   </style>
 </head>
 <body>
@@ -458,19 +724,15 @@ main{margin:0!important;width:100%!important;max-width:1180px!important;padding:
 
   <main>
     <section id="tab-ia" class="tab active">
-      <div class="page-head"><div><div class="eyebrow">Assistente interno</div><h1>IA de Atendimento</h1><p>Seu irmão cola a mensagem da cliente e a IA sugere uma resposta curta, segura e pronta para WhatsApp.</p></div><span class="pill">Front pronto • conectar endpoint depois</span></div>
+      <div class="page-head"><div><div class="eyebrow">Assistente interno</div><h1>IA de Atendimento</h1><p>Cole a mensagem da cliente e gere uma resposta curta para WhatsApp.</p></div></div>
       <div class="ai-layout">
         <div class="card ai-chat-card">
           <div class="ai-chat-head">
-            <div><strong>Mini chat de resposta</strong><span>Use como rascunho. A resposta deve ser revisada antes de enviar ao cliente.</span></div>
-            <div class="ai-status">Modo simulação</div>
+            <div><strong>Resposta rápida</strong><span>Rascunho para revisar antes de enviar.</span></div>
           </div>
           <div id="ai-chat-log" class="ai-chat-log">
-            <div class="ai-bubble assistant">Me mande o nome da cliente e a mensagem que ela enviou.
-
-Exemplo:
-Cliente: Angela
-Mensagem dela: Meu atestado foi enviado fora do prazo. E agora?</div>
+            <div class="ai-bubble assistant">Cole a mensagem da cliente aqui embaixo.
+Exemplo: Cliente Angela — meu documento está ilegível.</div>
           </div>
           <div class="ai-composer">
             <textarea id="ai-input" class="ai-input" placeholder="Cole aqui a mensagem. Ex:
@@ -485,17 +747,7 @@ Mensagem dela: O órgão respondeu que a documentação está ilegível. O que e
         </div>
         <div class="ai-side">
           <div class="card">
-            <h2>Regras da IA</h2>
-            <div class="ai-rule-list">
-              <div class="ai-rule"><svg class="icon"><use href="#i-check"></use></svg><span>Responder curto, claro e em tom de WhatsApp.</span></div>
-              <div class="ai-rule"><svg class="icon"><use href="#i-check"></use></svg><span>Não prometer aprovação, prazo ou resultado do órgão.</span></div>
-              <div class="ai-rule"><svg class="icon"><use href="#i-check"></use></svg><span>Reforçar que não temos vínculo com a Prefeitura quando necessário.</span></div>
-              <div class="ai-rule"><svg class="icon"><use href="#i-check"></use></svg><span>Quando faltar contexto, pedir print, protocolo ou mais detalhes.</span></div>
-            </div>
-            <div class="ai-copy-box">Depois você conecta o botão em um endpoint, por exemplo: <b>/api/gerar-resposta</b>.</div>
-          </div>
-          <div class="card">
-            <h2>Testes rápidos</h2>
+            <h2>Exemplos rápidos</h2>
             <div class="ai-examples">
               <button class="ai-example" onclick="setAiExample('Cliente: Angela
 Mensagem dela: Meu atestado foi enviado fora do prazo. E agora?')">Fora do prazo</button>
@@ -826,12 +1078,12 @@ function normalizeTextIA(value){
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z0-9\s]/g,' ')
+    .replace(/[^\w\s]/g,' ')
     .replace(/\s+/g,' ')
     .trim();
 }
 function tokenizeIA(value){
-  const stop=new Set(['para','com','uma','que','por','das','dos','sem','mais','muito','minha','meu','essa','esse','isso','estou','esta','está','voce','você','cliente','mensagem','dela','dele','nome']);
+  const stop=new Set(['para','com','uma','que','por','das','dos','sem','mais','muito','minha','meu','essa','esse','isso','estou','esta','voce','você','cliente','mensagem','dela','dele','nome']);
   return normalizeTextIA(value).split(' ').filter(w=>w.length>=4&&!stop.has(w));
 }
 function getPortalKnowledgeBase(){
@@ -953,7 +1205,7 @@ function copyAiReply(){
 function clearAiChat(){
   const log=document.getElementById('ai-chat-log'); if(!log)return;
   lastAiReply='';
-  log.innerHTML='<div class="ai-bubble assistant">Me mande o nome da cliente e a mensagem que ela enviou.\n\nExemplo:\nCliente: Angela\nMensagem dela: Meu atestado foi enviado fora do prazo. E agora?</div>';
+  log.innerHTML='<div class="ai-bubble assistant">Cole a mensagem da cliente aqui embaixo.\nExemplo: Cliente Angela — meu documento está ilegível.</div>';
 }
 function setAiExample(text){
   const input=document.getElementById('ai-input'); if(input){input.value=text; input.focus();}
