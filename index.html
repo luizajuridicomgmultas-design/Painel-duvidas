@@ -679,6 +679,30 @@ main{
       #tab-ia .ai-example{width:100%!important}
     }
 
+  
+
+    /* --- MINI PAINEL DO CHAT: clientes, dúvidas e casos problemáticos --- */
+    .ai-dashboard{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
+    .mini-stat{padding:16px!important;border-radius:18px!important}
+    .mini-stat span{display:block;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#64748B;margin-bottom:6px}
+    .mini-stat strong{display:block;font-size:1.35rem;letter-spacing:-.04em;color:#0F172A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mini-stat small{display:block;color:#64748B;font-size:.78rem;margin-top:5px;line-height:1.35}
+    .insights-panel{display:flex!important;flex-direction:column;gap:12px!important}
+    .insight-card{padding:14px!important;border-radius:18px!important}
+    .insight-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .insight-head h2{font-size:.96rem!important;margin:0!important}
+    .ranking-list{display:flex;flex-direction:column;gap:8px}
+    .rank-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:9px;align-items:center;border:1px solid #E1EBFF;background:#F8FBFF;border-radius:13px;padding:9px 10px}
+    .rank-num{width:24px;height:24px;border-radius:9px;display:grid;place-items:center;background:#EFF6FF;color:#1D4ED8;font-size:.72rem;font-weight:850}
+    .rank-info strong{display:block;font-size:.84rem;color:#0F172A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .rank-info span{display:block;font-size:.72rem;color:#64748B;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .rank-count{font-size:.72rem;font-weight:850;color:#1D4ED8;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:999px;padding:4px 8px;white-space:nowrap}
+    .rank-empty{border:1px dashed #C7DFFF;background:#F8FBFF;border-radius:13px;padding:12px;text-align:center;color:#64748B;font-size:.8rem;line-height:1.4}
+    .risk-high .rank-num{background:#FFF1F2;color:#E5484D}.risk-high .rank-count{background:#FFF1F2;color:#E5484D;border-color:#FFD5D8}
+    .risk-mid .rank-num{background:#FFF7ED;color:#C56A02}.risk-mid .rank-count{background:#FFF7ED;color:#C56A02;border-color:#FED7AA}
+    @media(max-width:980px){.ai-dashboard{grid-template-columns:1fr}.insights-panel{display:grid!important;grid-template-columns:1fr 1fr}.insights-panel .card:last-child{grid-column:1/-1}}
+    @media(max-width:760px){.ai-dashboard{grid-template-columns:1fr;gap:9px;margin-bottom:10px}.mini-stat{padding:12px!important}.mini-stat strong{font-size:1.05rem}.mini-stat small{font-size:.72rem}.insights-panel{display:flex!important}.rank-row{padding:8px}.rank-info strong{font-size:.8rem}.rank-info span{font-size:.69rem}}
+
   </style>
 </head>
 <body>
@@ -726,11 +750,40 @@ main{
 
   <main>
     <section id="tab-ia" class="tab active">
-      <div class="page-head"><div><div class="eyebrow">Assistente interno</div><h1>IA de Atendimento</h1><p>Cole a mensagem da cliente e gere uma resposta curta para WhatsApp.</p></div></div>
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">Assistente interno</div>
+          <h1>Chat de Atendimento</h1>
+          <p>Cole a mensagem da cliente, gere uma sugestão pronta para WhatsApp e acompanhe quais nomes e dúvidas mais aparecem.</p>
+        </div>
+      </div>
+
+      <div class="ai-dashboard">
+        <div class="mini-stat card">
+          <span>Atendimentos</span>
+          <strong id="insight-total">0</strong>
+          <small>Mensagens analisadas no painel</small>
+        </div>
+        <div class="mini-stat card">
+          <span>Cliente que mais aparece</span>
+          <strong id="insight-top-client">—</strong>
+          <small id="insight-top-client-count">Nenhum histórico ainda</small>
+        </div>
+        <div class="mini-stat card">
+          <span>Dúvida principal</span>
+          <strong id="insight-top-question">—</strong>
+          <small id="insight-top-question-count">Aguardando testes</small>
+        </div>
+      </div>
+
       <div class="ai-layout">
         <div class="card ai-chat-card">
           <div class="ai-chat-head">
-            <div><strong>Resposta rápida</strong><span>Rascunho para revisar antes de enviar.</span></div>
+            <div>
+              <strong>Resposta rápida</strong>
+              <span>Funciona só com as regras e textos do painel, sem Gemini.</span>
+            </div>
+            <span class="ai-status">Painel</span>
           </div>
           <div id="ai-chat-log" class="ai-chat-log">
             <div class="ai-bubble assistant">Cole a mensagem da cliente aqui embaixo.
@@ -747,18 +800,37 @@ Mensagem dela: O órgão respondeu que a documentação está ilegível. O que e
             </div>
           </div>
         </div>
-        <div class="ai-side">
+
+        <div class="ai-side insights-panel">
+          <div class="card insight-card">
+            <div class="insight-head">
+              <h2>Clientes mais citados</h2>
+              <button class="btn btn-ghost" onclick="clearSupportStats()">Zerar</button>
+            </div>
+            <div id="top-clients-list" class="ranking-list"></div>
+          </div>
+
+          <div class="card insight-card">
+            <div class="insight-head">
+              <h2>Dúvidas que mais aparecem</h2>
+            </div>
+            <div id="top-questions-list" class="ranking-list"></div>
+          </div>
+
+          <div class="card insight-card">
+            <div class="insight-head">
+              <h2>Clientes problemáticos</h2>
+            </div>
+            <div id="problem-clients-list" class="ranking-list"></div>
+          </div>
+
           <div class="card">
             <h2>Exemplos rápidos</h2>
             <div class="ai-examples">
-              <button class="ai-example" onclick="setAiExample('Cliente: Angela
-Mensagem dela: Meu atestado foi enviado fora do prazo. E agora?')">Fora do prazo</button>
-              <button class="ai-example" onclick="setAiExample('Cliente: Carla
-Mensagem dela: O órgão respondeu que meu documento está ilegível.')">Documento ilegível</button>
-              <button class="ai-example" onclick="setAiExample('Cliente: João
-Mensagem dele: Já enviei. Como acompanho o protocolo?')">Acompanhar protocolo</button>
-              <button class="ai-example" onclick="setAiExample('Cliente: Maria
-Mensagem dela: O app não está abrindo no meu celular.')">Erro no app</button>
+              <button class="ai-example" onclick="setAiExample('Cliente: Angela\nMensagem dela: Meu atestado foi enviado fora do prazo. E agora?')">Fora do prazo</button>
+              <button class="ai-example" onclick="setAiExample('Cliente: Carla\nMensagem dela: O órgão respondeu que meu documento está ilegível.')">Documento ilegível</button>
+              <button class="ai-example" onclick="setAiExample('Cliente: João\nMensagem dele: Já enviei. Como acompanho o protocolo?')">Acompanhar protocolo</button>
+              <button class="ai-example" onclick="setAiExample('Cliente: Maria\nMensagem dela: O app não está abrindo no meu celular.')">Erro no app</button>
             </div>
           </div>
         </div>
@@ -1075,10 +1147,25 @@ async function ensureDefaultReadyTemplates(){
 
 
 let lastAiReply='';
+const SUPPORT_STATS_KEY='atestado_facil_atendimento_stats';
+
 function extractClientName(raw){
   const t=String(raw||'');
-  const match=t.match(/cliente\s*:\s*([^\n\r]+)/i)||t.match(/nome\s*:\s*([^\n\r]+)/i);
-  if(match){return match[1].trim().split(/\s+/)[0].replace(/[.,;:]/g,'')}
+  const patterns=[
+    /cliente\s*:\s*([^\n\r]+)/i,
+    /nome\s+da\s+cliente\s*:\s*([^\n\r]+)/i,
+    /nome\s*:\s*([^\n\r]+)/i,
+    /cliente\s+([A-Za-zÀ-ÿ]{2,})/i
+  ];
+  for(const rgx of patterns){
+    const match=t.match(rgx);
+    if(match){
+      return match[1]
+        .trim()
+        .split(/\s+/)[0]
+        .replace(/[.,;:!?]/g,'');
+    }
+  }
   return '';
 }
 function normalizeTextIA(value){
@@ -1091,7 +1178,7 @@ function normalizeTextIA(value){
     .trim();
 }
 function tokenizeIA(value){
-  const stop=new Set(['para','com','uma','que','por','das','dos','sem','mais','muito','minha','meu','essa','esse','isso','estou','esta','voce','você','cliente','mensagem','dela','dele','nome']);
+  const stop=new Set(['para','com','uma','que','por','das','dos','sem','mais','muito','minha','meu','essa','esse','isso','estou','esta','voce','você','cliente','mensagem','dela','dele','nome','favor','aqui','hoje','ontem']);
   return normalizeTextIA(value).split(' ').filter(w=>w.length>=4&&!stop.has(w));
 }
 function getPortalKnowledgeBase(){
@@ -1115,6 +1202,100 @@ function getPortalKnowledgeBase(){
     }));
   }
   return base.filter(x=>String(x.content||'').trim());
+}
+function classifyQuestion(raw){
+  const text=normalizeTextIA(raw);
+  const categories=[
+    {label:'Protocolo / retorno',keys:['protocolo','retorno','status','acompanhar','resposta','consulta','respondeu']},
+    {label:'Prazo / fora do prazo',keys:['prazo','atrasado','atrasada','fora prazo','fora do prazo','afastamento','dias uteis']},
+    {label:'Documento ilegível',keys:['ilegivel','borrado','cortado','documento','anexo','foto','incorreto','incorreta']},
+    {label:'Medo de golpe / Prefeitura',keys:['prefeitura','oficial','golpe','confiavel','seguro','verdade','dados']},
+    {label:'Código / acesso',keys:['codigo','acesso','bloqueado','vencido','renovar','renovacao','login','celular']},
+    {label:'Pagamento',keys:['pagamento','pix','comprovante','valor','pagar','paguei']},
+    {label:'Erro no app',keys:['erro','travou','bug','abre','falha','tela branca','consigo','funciona']},
+    {label:'Alteração de dados',keys:['alterar','corrigir','errado','mudar','trocar','dados']},
+    {label:'Responsabilidade',keys:['responsabilizar','culpa','garantia','problema','processar','perder']}
+  ];
+  const found=categories.find(c=>c.keys.some(k=>text.includes(normalizeTextIA(k))));
+  return found?found.label:'Outras dúvidas';
+}
+function getRiskLevel(raw){
+  const text=normalizeTextIA(raw);
+  let score=0;
+  ['brava','absurdo','processar','reclamar','procon','advogado','responsabilizar','culpa','medo','perder','urgente','hoje','agora','paguei','ninguem respondeu','vou reclamar'].forEach(k=>{if(text.includes(normalizeTextIA(k)))score+=2;});
+  ['fora do prazo','perdi o prazo','documento ilegivel','nao recebi protocolo','prefeitura'].forEach(k=>{if(text.includes(normalizeTextIA(k)))score+=1;});
+  if(score>=4)return 'alto';
+  if(score>=2)return 'medio';
+  return 'baixo';
+}
+function getSupportStats(){
+  try{return JSON.parse(localStorage.getItem(SUPPORT_STATS_KEY)||'[]')}catch(e){return []}
+}
+function saveSupportStats(stats){localStorage.setItem(SUPPORT_STATS_KEY,JSON.stringify(stats.slice(-300)));}
+function logSupportMessage(raw){
+  const stats=getSupportStats();
+  stats.push({
+    id:Date.now(),
+    createdAt:new Date().toISOString(),
+    client:extractClientName(raw)||'Sem nome',
+    question:classifyQuestion(raw),
+    risk:getRiskLevel(raw),
+    preview:String(raw||'').replace(/\s+/g,' ').trim().slice(0,140)
+  });
+  saveSupportStats(stats);
+  renderSupportInsights();
+}
+function countBy(arr,key){
+  return arr.reduce((acc,item)=>{const k=item[key]||'Sem nome';acc[k]=(acc[k]||0)+1;return acc;},{});
+}
+function topFromCount(counts,limit=5){
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,limit);
+}
+function renderRanking(containerId,items,emptyText,options={}){
+  const el=document.getElementById(containerId); if(!el)return;
+  if(!items.length){el.innerHTML=`<div class="rank-empty">${esc(emptyText)}</div>`;return;}
+  el.innerHTML=items.map(([label,count],idx)=>{
+    const extra=options.extra?.[label]||'';
+    const riskClass=options.risk?.[label]==='alto'?'risk-high':options.risk?.[label]==='medio'?'risk-mid':'';
+    return `<div class="rank-row ${riskClass}"><div class="rank-num">${idx+1}</div><div class="rank-info"><strong>${esc(label)}</strong><span>${esc(extra||options.subtitle||'registrado no chat')}</span></div><div class="rank-count">${count}x</div></div>`;
+  }).join('');
+}
+function renderSupportInsights(){
+  const stats=getSupportStats();
+  const total=document.getElementById('insight-total'); if(total)total.textContent=stats.length;
+
+  const clients=topFromCount(countBy(stats.filter(x=>x.client!=='Sem nome'),'client'),5);
+  const questions=topFromCount(countBy(stats,'question'),5);
+
+  const topClient=document.getElementById('insight-top-client');
+  const topClientCount=document.getElementById('insight-top-client-count');
+  if(topClient)topClient.textContent=clients[0]?.[0]||'—';
+  if(topClientCount)topClientCount.textContent=clients[0]?`${clients[0][1]} aparição(ões)`:'Nenhum histórico ainda';
+
+  const topQuestion=document.getElementById('insight-top-question');
+  const topQuestionCount=document.getElementById('insight-top-question-count');
+  if(topQuestion)topQuestion.textContent=questions[0]?.[0]||'—';
+  if(topQuestionCount)topQuestionCount.textContent=questions[0]?`${questions[0][1]} vez(es) no chat`:'Aguardando testes';
+
+  renderRanking('top-clients-list',clients,'Os nomes vão aparecer aqui conforme você testar o chat.',{subtitle:'cliente citado'});
+  renderRanking('top-questions-list',questions,'As dúvidas mais repetidas vão aparecer aqui.',{subtitle:'tipo de dúvida'});
+
+  const riskyStats=stats.filter(x=>x.risk==='alto'||x.risk==='medio');
+  const riskyCounts=topFromCount(countBy(riskyStats.filter(x=>x.client!=='Sem nome'),'client'),5);
+  const riskMap={};
+  const extraMap={};
+  riskyStats.forEach(item=>{
+    if(item.client==='Sem nome')return;
+    if(item.risk==='alto'||!riskMap[item.client])riskMap[item.client]=item.risk;
+    extraMap[item.client]=item.question;
+  });
+  renderRanking('problem-clients-list',riskyCounts,'Casos com urgência, cobrança ou risco vão aparecer aqui.',{risk:riskMap,extra:extraMap});
+}
+function clearSupportStats(){
+  if(!confirm('Zerar o histórico do mini painel?'))return;
+  localStorage.removeItem(SUPPORT_STATS_KEY);
+  renderSupportInsights();
+  toast('Mini painel zerado.');
 }
 function findPortalAnswer(raw){
   const textNorm=normalizeTextIA(raw);
@@ -1164,24 +1345,19 @@ function humanizePortalAnswer(found,nome,raw){
   const oi=nome?`Olá, ${nome}.`:'Olá.';
 
   if(/prazo|dias uteis|fora prazo|fora do prazo/.test(`${title} ${text}`)){
-    return `${oi}\n\nVocê enviou que dia?\n\nO servidor deve solicitar a perícia em até 2 dias úteis após o início do afastamento.\n\nSábado, domingo, feriados e pontos facultativos não contam como dia útil para protocolo.\n\nEntão, se ainda não enviamos o protocolo para você, é porque a perícia ainda não respondeu, e esse pode ser um dos motivos.\n\nSe você acha que não foi esse o caso, pode nos explicar aqui que verificamos melhor.`;
+    return `${oi}\n\nVocê enviou que dia?\n\nO servidor deve solicitar a perícia em até 2 dias úteis após o início do afastamento.\n\nSábado, domingo, feriados e pontos facultativos não contam como dia útil.\n\nCom a data do início do afastamento e a data do envio, consigo conferir melhor antes de te orientar.`;
   }
-
   if(/protocolo|retorno|status|acompanhar/.test(text)){
-    return `${oi}\n\nAinda não tivemos retorno da perícia sobre essa solicitação.\n\nAssim que o órgão responder, enviamos o protocolo ou a orientação recebida para você.\n\nSó reforçando que esse prazo de resposta não depende do Atestado Fácil, porque quem analisa é o órgão responsável.\n\nSe quiser, me envie a data do envio para eu conferir melhor.`;
+    return `${oi}\n\nVocê enviou que dia?\n\nO protocolo só é repassado quando o órgão responde o e-mail da solicitação.\n\nAssim que houver retorno, enviamos para você por aqui. O prazo de resposta depende da perícia, não do Atestado Fácil.`;
   }
-
   if(/ilegivel|documento|anexo|foto|borrad|cortad|incorreta|errado/.test(text)){
-    return `${oi}\n\nA perícia informou que o documento não foi aceito ou não ficou legível.\n\nVocê consegue enviar novamente em uma foto mais nítida, sem corte, sombra ou parte borrada?\n\nCom o documento correto, conseguimos orientar o novo envio com mais segurança.`;
+    return `${oi}\n\nA perícia informou que o documento não foi aceito ou não ficou legível.\n\nVocê consegue enviar novamente em uma foto mais nítida, sem corte, sombra ou parte borrada?\n\nAssim conseguimos orientar o novo envio com mais segurança.`;
   }
-
   if(/prefeitura|oficial|golpe|confiavel|seguro|verdade/.test(text)){
     return `${oi}\n\nEntendo sua preocupação.\n\nO Atestado Fácil não é um app da Prefeitura. É uma ferramenta independente, criada para facilitar o preenchimento e envio do formulário de perícia médica por e-mail.\n\nA gente ajuda com o envio e acompanha o e-mail até a resposta do órgão, mas não temos vínculo oficial com a Prefeitura.`;
   }
-
   return personalizeReadyAnswer(found.content,nome);
 }
-
 function buildAiReply(raw){
   const text=normalizeTextIA(raw);
   const nome=extractClientName(raw);
@@ -1199,7 +1375,7 @@ function buildAiReply(raw){
   }else if(/protocolo|nao chegou|retorno|resposta do orgao|status|acompanhar|consulta/.test(text)){
     resposta=`${oi}\n\nVocê enviou que dia?\n\nSe ainda não enviamos o protocolo para você, é porque a perícia ainda não respondeu.\n\nAssim que houver retorno do órgão, encaminhamos o protocolo ou a orientação recebida.\n\nSó lembrando que o prazo de resposta depende da perícia, não do Atestado Fácil.`;
   }else if(/fora do prazo|atrasad|perdi o prazo|prazo/.test(text)){
-    resposta=`${oi}\n\nVocê pode me dizer a data de início do afastamento e a data em que enviou?\n\nO servidor deve solicitar a perícia em até 2 dias úteis após o início do afastamento.\n\nSábado, domingo, feriados e pontos facultativos não contam como dia útil para protocolo.\n\nCom essas datas, consigo te orientar melhor.`;
+    resposta=`${oi}\n\nVocê pode me dizer a data de início do afastamento e a data em que enviou?\n\nO servidor deve solicitar a perícia em até 2 dias úteis após o início do afastamento.\n\nSábado, domingo, feriados e pontos facultativos não contam como dia útil.\n\nCom essas datas, consigo te orientar melhor.`;
   }else if(/ilegivel|documento|anexo|foto|borrad|cortad|incorreta|errado/.test(text)){
     resposta=`${oi}\n\nA perícia informou que o documento não foi aceito ou não ficou legível.\n\nVocê consegue enviar novamente em uma foto mais nítida, sem corte, sombra ou parte borrada?\n\nSe puder, me envie também o print da resposta que apareceu.`;
   }else if(/erro|nao abre|trav|bug|nao consigo|falha|tela branca/.test(text)){
@@ -1208,77 +1384,34 @@ function buildAiReply(raw){
     resposta=`${oi}\n\nMe envie o comprovante, por favor.\n\nAssim que conferirmos, seguimos com a liberação do seu código de acesso.\n\nLembrando que o acesso é individual e fica vinculado aos dados cadastrados.`;
   }else if(/codigo|acesso|nao funciona|bloqueado|vencido|renovar|renovacao/.test(text)){
     resposta=`${oi}\n\nMe envie o nome completo ou o código que você está tentando usar.\n\nVou conferir a situação do acesso e te digo certinho o que precisa ser feito.`;
-  }else if(/excluir|apagar|remover dados|meus dados|lgpd/.test(text)){
-    resposta=`${oi}\n\nTudo bem. Para solicitar a exclusão dos seus dados, envie um e-mail para: suportenexalab@gmail.com\n\nNo e-mail, informe seu nome completo e telefone cadastrado para conseguirmos localizar corretamente.`;
+  }else if(/alterar|corrigir|errado|mudar|trocar/.test(text)){
+    resposta=`${oi}\n\nMe informe qual dado precisa ser alterado.\n\nVou verificar se ainda conseguimos corrigir antes de um novo envio ou se será necessário fazer uma nova solicitação.`;
   }else{
     resposta=`${oi}\n\nEntendi. Me envie um print da mensagem ou mais detalhes do que apareceu, por favor.\n\nAssim consigo te orientar com mais segurança.\n\nSó reforçando que o Atestado Fácil ajuda no preenchimento e envio por e-mail, mas a análise e resposta são feitas pelo órgão responsável.`;
   }
-  return `Recomendo responder assim:\n\n${resposta}\n\nObservação interna: não encontrei uma resposta cadastrada igual no portal, então usei uma regra segura e em tom de WhatsApp. Se essa dúvida aparecer sempre, cadastre uma dúvida pronta para melhorar a sugestão.`;
+  return `Recomendo responder assim:\n\n${resposta}\n\nObservação interna: resposta gerada pelo próprio painel, sem Gemini. Se essa dúvida aparecer sempre, cadastre uma dúvida pronta para melhorar a sugestão.`;
 }
 function addAiBubble(role,text){
   const log=document.getElementById('ai-chat-log'); if(!log)return;
   const div=document.createElement('div'); div.className=`ai-bubble ${role}`; div.textContent=text;
   log.appendChild(div); log.scrollTop=log.scrollHeight;
 }
-async function generateAiReply(){
+function generateAiReply(){
   const input=document.getElementById('ai-input');
   if(!input)return;
-
   const raw=input.value.trim();
   if(!raw)return toast('Cole a mensagem da cliente primeiro.');
-
   addAiBubble('user', raw);
-  addAiBubble('assistant', 'Gerando resposta com IA...');
+  const reply=buildAiReply(raw);
+  lastAiReply=reply;
+  logSupportMessage(raw);
+  setTimeout(()=>addAiBubble('assistant',reply),180);
   input.value='';
-
-  try{
-    const basePortal={
-      duvidas:data.duvidas||[],
-      mensagensProntas:data.ready||[],
-      tutoriais:data.tutoriais||[],
-      links:data.links||[]
-    };
-
-    const response=await fetch('/api/gemini-atendimento',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({mensagemCliente:raw,basePortal})
-    });
-
-    const result=await response.json();
-
-    const log=document.getElementById('ai-chat-log');
-    const bubbles=log?.querySelectorAll('.ai-bubble.assistant');
-    const loading=bubbles?.[bubbles.length-1];
-    if(loading&&loading.textContent==='Gerando resposta com IA...')loading.remove();
-
-    if(!response.ok){
-      toast(result.error||'Erro ao gerar resposta. Usei a resposta automática.');
-      const fallback=buildAiReply(raw);
-      lastAiReply=fallback;
-      addAiBubble('assistant',fallback);
-      return;
-    }
-
-    lastAiReply=result.resposta||'';
-    addAiBubble('assistant',lastAiReply||'Não consegui gerar uma resposta agora.');
-  }catch(err){
-    console.error(err);
-    const log=document.getElementById('ai-chat-log');
-    const bubbles=log?.querySelectorAll('.ai-bubble.assistant');
-    const loading=bubbles?.[bubbles.length-1];
-    if(loading&&loading.textContent==='Gerando resposta com IA...')loading.remove();
-
-    toast('Erro ao conectar com a IA. Usei a resposta automática.');
-    const fallback=buildAiReply(raw);
-    lastAiReply=fallback;
-    addAiBubble('assistant',fallback);
-  }
 }
 function copyAiReply(){
   if(!lastAiReply)return toast('Gere uma resposta primeiro.');
   const clean=String(lastAiReply)
-    .replace(/^Recomendo responder assim:\n\n/i,'')
+    .replace(/^Recomendo responder assim:\s*/i,'')
     .replace(/^Resposta sugerida:\s*/i,'')
     .replace(/\n\nObservação interna:[\s\S]*$/i,'')
     .replace(/Observação interna:[\s\S]*$/i,'')
@@ -1583,7 +1716,7 @@ async function taskStatus(id,st){const t=data.tasks.find(x=>x.id===id);if(t){t.s
 async function del(key,id){if(!confirm('Excluir este item?'))return;const ok=await deleteCloud(key,id);if(!ok)return;data[key]=data[key].filter(x=>x.id!==id);set(key,data[key]);renderDuvidas();renderReady();renderTutoriais();renderNotes();renderTasks();toast('Excluído!')}
 
 async function initPortal(){
-  renderDuvidas();renderReady();renderTutoriais();renderLinks();renderNotes();renderTasks();
+  renderDuvidas();renderReady();renderTutoriais();renderLinks();renderNotes();renderTasks();renderSupportInsights();
   await loadFromSupabase();
   await ensureDefaultReadyTemplates();
   renderReady();
