@@ -823,6 +823,8 @@ Mensagem dela: O órgão respondeu que a documentação está ilegível. O que e
             </div>
             <div id="problem-clients-list" class="ranking-list"></div>
           </div>
+
+div>
         </div>
       </div>
     </section>
@@ -1029,7 +1031,7 @@ const defaults={
 };
 function get(k){return JSON.parse(localStorage.getItem('af_'+k+'_v9')||JSON.stringify(defaults[k]||[]))}
 function set(k,v){localStorage.setItem('af_'+k+'_v9',JSON.stringify(v))}
-let data={duvidas:get('duvidas'),ready:get('ready'),tutoriais:get('tutoriais'),notes:get('notes'),anexos:get('anexos'),links:get('links'),tasks:get('tasks')};
+let data={duvidas:get('duvidas'),ready:get('ready'),tutoriais:get('tutoriais'),notes:get('notes'),anexos:get('anexos'),links:get('links'),tasks:get('tasks'),intencoes:get('intencoes'),bloqueios:get('bloqueios'),sinonimos:get('sinonimos'),alertas:get('alertas')};
 const TABLES={duvidas:'duvidas_prontas',ready:'mensagens_prontas',tutoriais:'tutoriais',tasks:'tarefas',notes:'anotacoes',links:'links'};
 function svg(id){return `<svg class="icon"><use href="#${id}"></use></svg>`}
 function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.getElementById('toast').appendChild(t);setTimeout(()=>t.remove(),2600)}
@@ -1086,7 +1088,7 @@ async function safeSelect(table){
 async function loadFromSupabase(){
   if(!useSupabase)return;
   try{
-    const [duvidas,ready,tutoriais,notes,tasks,anexos,links,chat]=await Promise.all([
+    const [duvidas,ready,tutoriais,notes,tasks,anexos,links,chat,intencoes,bloqueios,sinonimos,alertas]=await Promise.all([
       safeSelect(TABLES.duvidas),
       safeSelect(TABLES.ready),
       safeSelect(TABLES.tutoriais),
@@ -1094,7 +1096,11 @@ async function loadFromSupabase(){
       safeSelect(TABLES.tasks),
       safeSelect('anexos'),
       safeSelect(TABLES.links),
-      safeSelect('chat_atendimentos')
+      safeSelect('chat_atendimentos'),
+      safeSelect('atendimento_intencoes'),
+      safeSelect('atendimento_bloqueios'),
+      safeSelect('atendimento_sinonimos'),
+      safeSelect('atendimento_alertas')
     ]);
 
     if(!duvidas.error&&duvidas.data?.length)data.duvidas=duvidas.data.map(r=>fromDb('duvidas',r)).filter(x=>x.title||x.text);
@@ -1105,6 +1111,10 @@ async function loadFromSupabase(){
     if(!anexos.error&&anexos.data)data.anexos=anexos.data.map(r=>fromDb('anexos',r));
     if(!links.error&&links.data?.length)data.links=links.data.map(r=>fromDb('links',r)).filter(x=>x.title||x.url);
     if(!chat.error&&chat.data?.length)loadSupportStatsFromRows(chat.data);
+    if(!intencoes.error&&intencoes.data?.length)data.intencoes=intencoes.data.map(r=>({id:r.id,nome:r.nome||r.titulo||'',categoria:r.categoria||'',prioridade:Number(r.prioridade||1),palavras_chave:r.palavras_chave||[],resposta_base:r.resposta_base||r.resposta||r.mensagem||'',ativo:r.ativo!==false})).filter(x=>x.nome&&x.resposta_base&&x.ativo);
+    if(!bloqueios.error&&bloqueios.data?.length)data.bloqueios=bloqueios.data.map(r=>({id:r.id,situacao:r.situacao||'',palavras_chave:r.palavras_chave||[],orientacao:r.orientacao||'',ativo:r.ativo!==false})).filter(x=>x.orientacao&&x.ativo);
+    if(!sinonimos.error&&sinonimos.data?.length)data.sinonimos=sinonimos.data.map(r=>({termo:r.termo||'',grupo:r.grupo||'',peso:Number(r.peso||1),ativo:r.ativo!==false})).filter(x=>x.termo&&x.ativo);
+    if(!alertas.error&&alertas.data?.length)data.alertas=alertas.data.map(r=>({termo:r.termo||'',nivel:r.nivel||'atenção',descricao:r.descricao||'',ativo:r.ativo!==false})).filter(x=>x.termo&&x.ativo);
 
     saveLocalAll();
     renderDuvidas();renderReady();renderTutoriais();renderLinks();renderNotes();renderTasks();renderSupportInsights();
@@ -1206,70 +1216,52 @@ function normalizeTextIA(value){
     .trim();
 }
 function tokenizeIA(value){
-  const stop=new Set(['para','com','uma','que','por','das','dos','sem','mais','muito','minha','meu','essa','esse','isso','estou','esta','voce','você','cliente','mensagem','dela','dele','nome','favor','aqui','hoje','ontem']);
+  const stop=new Set(['para','com','uma','que','por','das','dos','sem','mais','muito','minha','meu','essa','esse','isso','estou','esta','voce','você','cliente','mensagem','dela','dele','nome','favor','aqui','hoje','ontem','tambem','também','sobre','pelo','pela','pelos','pelas']);
   return normalizeTextIA(value).split(' ').filter(w=>w.length>=4&&!stop.has(w));
 }
+function hasAnyIA(text,keys){return (keys||[]).some(k=>text.includes(normalizeTextIA(k)));}
+function hasPhraseIA(text,keys){return (keys||[]).some(k=>normalizeTextIA(k).split(' ').length>1 && text.includes(normalizeTextIA(k)));}
 function getPortalKnowledgeBase(){
   const base=[];
-  if(Array.isArray(data.duvidas)){
-    data.duvidas.forEach(d=>base.push({
-      origem:'Dúvida pronta',
-      title:d.title||d.titulo||'',
-      content:d.text||d.resposta||d.content||d.conteudo||'',
-      type:d.type||d.tipo||'',
-      subtype:d.subtype||d.subtipo||''
-    }));
+  if(Array.isArray(data.intencoes)){
+    data.intencoes.forEach(i=>base.push({origem:'Intenção',title:i.nome||'',content:i.resposta_base||'',type:i.categoria||'',subtype:'',priority:Number(i.prioridade||1),keywords:i.palavras_chave||[]}));
   }
   if(Array.isArray(data.ready)){
-    data.ready.forEach(m=>base.push({
-      origem:'Mensagem pronta',
-      title:m.title||m.titulo||'',
-      content:m.text||m.mensagem||m.content||m.conteudo||'',
-      type:m.type||m.tipo||'',
-      subtype:''
-    }));
+    data.ready.forEach(m=>base.push({origem:'Mensagem pronta',title:m.title||m.titulo||'',content:m.text||m.mensagem||m.content||m.conteudo||'',type:m.type||m.tipo||'',subtype:'',priority:45,keywords:m.palavras_chave||[]}));
+  }
+  if(Array.isArray(data.duvidas)){
+    data.duvidas.forEach(d=>base.push({origem:'Dúvida pronta',title:d.title||d.titulo||'',content:d.text||d.resposta||d.content||d.conteudo||'',type:d.type||d.tipo||'',subtype:d.subtype||d.subtipo||'',priority:30,keywords:d.palavras_chave||[]}));
   }
   return base.filter(x=>String(x.content||'').trim());
 }
-function classifyQuestion(raw){
-  const text=normalizeTextIA(raw);
-  const categories=[
-    {label:'Protocolo / retorno',keys:['protocolo','retorno','status','acompanhar','resposta','consulta','respondeu']},
-    {label:'Prazo / fora do prazo',keys:['prazo','atrasado','atrasada','fora prazo','fora do prazo','afastamento','dias uteis']},
-    {label:'Documento ilegível',keys:['ilegivel','borrado','cortado','documento','anexo','foto','incorreto','incorreta']},
-    {label:'Medo de golpe / Prefeitura',keys:['prefeitura','oficial','golpe','confiavel','seguro','verdade','dados']},
-    {label:'Código / acesso',keys:['codigo','acesso','bloqueado','vencido','renovar','renovacao','login','celular']},
-    {label:'Pagamento',keys:['pagamento','pix','comprovante','valor','pagar','paguei']},
-    {label:'Erro no app',keys:['erro','travou','bug','abre','falha','tela branca','consigo','funciona']},
-    {label:'Alteração de dados',keys:['alterar','corrigir','errado','mudar','trocar','dados']},
-    {label:'Responsabilidade',keys:['responsabilizar','culpa','garantia','problema','processar','perder']}
+function detectScenarioIA(raw){
+  const t=normalizeTextIA(raw);
+  const rules=[
+    {id:'irregular',label:'Pedido irregular / alteração indevida',risk:'alto',keys:['colocar outra data','mudar a data','alterar data','dar um jeito','jeitinho','fazer passar','aumentar os dias','mudar atestado','alterar atestado','qual cid colocar']},
+    {id:'privacy',label:'Privacidade / dados',risk:'alto',keys:['quem ve meus documentos','quem vê meus documentos','meus dados ficam salvos','guardam meus documentos','apagam meus documentos','excluir meus dados','deletar meus dados','privacidade','sigilo','quem tem acesso']},
+    {id:'golpe',label:'Medo de golpe / Prefeitura',risk:'alto',keys:['golpe','parece golpe','medo de golpe','estranho','confiavel','confiável','e seguro','é seguro','nao sao da prefeitura','não são da prefeitura','app da prefeitura','aplicativo da prefeitura','oficial da prefeitura','taxa da prefeitura']},
+    {id:'garantia',label:'Garantia / responsabilidade',risk:'alto',keys:['garante','garantia','vai ser aceito','vai ser aprovado','deferido','deferimento','se negar a culpa','culpa de voces','culpa de vocês','responsabilidade de voces','responsabilidade de vocês','vocês se responsabilizam','voces se responsabilizam']},
+    {id:'brava',label:'Cliente brava / cobrança',risk:'alto',keys:['paguei e ninguem respondeu','paguei e ninguém respondeu','vou reclamar','procon','advogado','quero meu dinheiro','propaganda enganosa','resolver hoje','voces tem que resolver','vocês têm que resolver','absurdo','ninguem respondeu','ninguém respondeu']},
+    {id:'sistema_prefeitura',label:'Acesso ao sistema da Prefeitura',risk:'medio',keys:['entra no sistema','sistema da prefeitura','acesso interno','consulta pra mim','ver no sistema','olha la no sistema','olha lá no sistema']},
+    {id:'apagar_email',label:'Apagar ou trocar envio',risk:'medio',keys:['apagar o email','apagar o e mail','cancelar email','desfazer envio','trocar documento enviado','apagar o e-mail','trocar pelo certo']},
+    {id:'protocolo',label:'Protocolo / retorno',risk:'medio',keys:['protocolo','comprovante de envio','prova que enviou','status','acompanhar','retorno do orgao','retorno do órgão','orgao respondeu','órgão respondeu','prefeitura recebeu']},
+    {id:'prazo',label:'Prazo / fora do prazo',risk:'medio',keys:['prazo','fora do prazo','perdi o prazo','atrasado','atrasada','2 dias uteis','2 dias úteis','afastamento','sabado conta','sábado conta','feriado conta','quando vence']},
+    {id:'pagamento',label:'Pagamento / acesso pago',risk:'medio',keys:['quanto custa','qual valor','preco','preço','pix','comprovante','paguei','reembolso','estorno','por que pagar','fazer de graca','fazer de graça']},
+    {id:'codigo',label:'Código / acesso',risk:'baixo',keys:['codigo','código','acesso','login','nao entra','não entra','troquei de celular','celular novo','vencido','renovar','hifen','hífen']},
+    {id:'erro_app',label:'Erro no app',risk:'baixo',keys:['erro','travou','tela branca','nao abre','não abre','nao carrega','não carrega','botao nao funciona','botão não funciona','nao consigo anexar','não consigo anexar','falha no envio']},
+    {id:'doc_ruim',label:'Documento ilegível / inválido',risk:'baixo',keys:['ilegivel','ilegível','cortada','cortado','borrada','foto escura','rasurado','rasura','sem assinatura','sem carimbo','sem data','sem crm','letra ruim','nao da para ler','não dá para ler']},
+    {id:'dados_errados',label:'Alteração de dados',risk:'baixo',keys:['cpf errado','nome errado','telefone errado','cargo errado','matricula errada','matrícula errada','unidade errada','corrigir dados','alterar dados','mudei de setor','mudei de cargo']},
+    {id:'outra_prefeitura',label:'Uso em outra Prefeitura',risk:'baixo',keys:['outra prefeitura','outro municipio','outro município','outra cidade','nao sou de contagem','não sou de contagem']},
+    {id:'agendamento',label:'Confusão sobre agendamento',risk:'baixo',keys:['marcar minha pericia','marcar minha perícia','agendar pericia','agendar perícia','achei que voces iam marcar','achei que vocês iam marcar']},
+    {id:'como_funciona',label:'Como funciona',risk:'baixo',keys:['como funciona','para que serve','pra que serve','precisa instalar','baixar app','abrir gmail','como usar']}
   ];
-  const found=categories.find(c=>c.keys.some(k=>text.includes(normalizeTextIA(k))));
-  return found?found.label:'Outras dúvidas';
+  return rules.find(r=>hasAnyIA(t,r.keys))||{id:'generico',label:'Outras dúvidas',risk:'baixo',keys:[]};
 }
-function getRiskLevel(raw){
-  const text=normalizeTextIA(raw);
-  let score=0;
-  ['brava','absurdo','processar','reclamar','procon','advogado','responsabilizar','culpa','medo','perder','urgente','hoje','agora','paguei','ninguem respondeu','vou reclamar'].forEach(k=>{if(text.includes(normalizeTextIA(k)))score+=2;});
-  ['fora do prazo','perdi o prazo','documento ilegivel','nao recebi protocolo','prefeitura'].forEach(k=>{if(text.includes(normalizeTextIA(k)))score+=1;});
-  if(score>=4)return 'alto';
-  if(score>=2)return 'medio';
-  return 'baixo';
-}
-function getSupportStats(){
-  try{return JSON.parse(localStorage.getItem(SUPPORT_STATS_KEY)||'[]')}catch(e){return []}
-}
+function classifyQuestion(raw){return detectScenarioIA(raw).label;}
+function getRiskLevel(raw){return detectScenarioIA(raw).risk;}
+function getSupportStats(){try{return JSON.parse(localStorage.getItem(SUPPORT_STATS_KEY)||'[]')}catch(e){return []}}
 function saveSupportStats(stats){localStorage.setItem(SUPPORT_STATS_KEY,JSON.stringify(stats.slice(-300)));}
-function rowToSupportStat(row){
-  return {
-    id:row.id||Date.now(),
-    createdAt:firstVal(row,['created_at','criado_em'],new Date().toISOString()),
-    client:firstVal(row,['nome_cliente','cliente'],'Sem nome')||'Sem nome',
-    question:firstVal(row,['assunto_detectado','assunto'],'Outras dúvidas'),
-    risk:firstVal(row,['nivel_alerta','risco'],'baixo'),
-    preview:String(firstVal(row,['mensagem_cliente','mensagem','texto'],'')).replace(/\s+/g,' ').trim().slice(0,140)
-  };
-}
+function rowToSupportStat(row){return {id:row.id||Date.now(),createdAt:firstVal(row,['created_at','criado_em'],new Date().toISOString()),client:firstVal(row,['nome_cliente','cliente'],'Sem nome')||'Sem nome',question:firstVal(row,['assunto_detectado','assunto'],'Outras dúvidas'),risk:firstVal(row,['nivel_alerta','risco'],'baixo'),preview:String(firstVal(row,['mensagem_cliente','mensagem','texto'],'')).replace(/\s+/g,' ').trim().slice(0,140)};}
 function loadSupportStatsFromRows(rows){
   const local=getSupportStats();
   const incoming=(rows||[]).map(rowToSupportStat);
@@ -1280,249 +1272,99 @@ function loadSupportStatsFromRows(rows){
 async function saveChatAtendimentoCloud(item,resposta){
   if(!useSupabase)return;
   try{
-    const payload={
-      nome_cliente:item.client==='Sem nome'?null:item.client,
-      mensagem_cliente:item.raw,
-      resposta_sugerida:resposta||'',
-      assunto_detectado:item.question,
-      nivel_alerta:item.risk,
-      palavras_detectadas:tokenizeIA(item.raw).slice(0,20)
-    };
+    const payload={nome_cliente:item.client==='Sem nome'?null:item.client,mensagem_cliente:item.raw,resposta_sugerida:resposta||'',assunto_detectado:item.question,nivel_alerta:item.risk,palavras_detectadas:tokenizeIA(item.raw).slice(0,20)};
     const res=await supabaseClient.from('chat_atendimentos').insert(payload);
     if(res.error)console.warn('Não salvou chat_atendimentos:',res.error);
   }catch(e){console.warn('Falha ao salvar atendimento no Supabase:',e)}
 }
 function logSupportMessage(raw,resposta=''){
-  const item={
-    id:Date.now(),
-    createdAt:new Date().toISOString(),
-    client:extractClientName(raw)||'Sem nome',
-    question:classifyQuestion(raw),
-    risk:getRiskLevel(raw),
-    preview:String(raw||'').replace(/\s+/g,' ').trim().slice(0,140),
-    raw:String(raw||'')
-  };
-  const stats=getSupportStats();
-  stats.push(item);
-  saveSupportStats(stats);
-  renderSupportInsights();
-  saveChatAtendimentoCloud(item,resposta);
+  const scenario=detectScenarioIA(raw);
+  const item={id:Date.now(),createdAt:new Date().toISOString(),client:extractClientName(raw)||'Sem nome',question:scenario.label,risk:scenario.risk,preview:String(raw||'').replace(/\s+/g,' ').trim().slice(0,140),raw:String(raw||'')};
+  const stats=getSupportStats();stats.push(item);saveSupportStats(stats);renderSupportInsights();saveChatAtendimentoCloud(item,resposta);
 }
-
-function countBy(arr,key){
-  return arr.reduce((acc,item)=>{const k=item[key]||'Sem nome';acc[k]=(acc[k]||0)+1;return acc;},{});
-}
-function topFromCount(counts,limit=5){
-  return Object.entries(counts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,limit);
-}
+function countBy(arr,key){return arr.reduce((acc,item)=>{const k=item[key]||'Sem nome';acc[k]=(acc[k]||0)+1;return acc;},{});}
+function topFromCount(counts,limit=3){return Object.entries(counts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,limit);}
 function renderRanking(containerId,items,emptyText,options={}){
   const el=document.getElementById(containerId); if(!el)return;
   if(!items.length){el.innerHTML=`<div class="rank-empty">${esc(emptyText)}</div>`;return;}
-  el.innerHTML=items.map(([label,count],idx)=>{
-    const extra=options.extra?.[label]||'';
-    const riskClass=options.risk?.[label]==='alto'?'risk-high':options.risk?.[label]==='medio'?'risk-mid':'';
-    return `<div class="rank-row ${riskClass}"><div class="rank-num">${idx+1}</div><div class="rank-info"><strong>${esc(label)}</strong><span>${esc(extra||options.subtitle||'registrado no chat')}</span></div><div class="rank-count">${count}x</div></div>`;
-  }).join('');
+  el.innerHTML=items.map(([label,count],idx)=>{const extra=options.extra?.[label]||'';const riskClass=options.risk?.[label]==='alto'?'risk-high':options.risk?.[label]==='medio'?'risk-mid':'';return `<div class="rank-row ${riskClass}"><div class="rank-num">${idx+1}</div><div class="rank-info"><strong>${esc(label)}</strong><span>${esc(extra||options.subtitle||'registrado no chat')}</span></div><div class="rank-count">${count}x</div></div>`;}).join('');
 }
 function renderSupportInsights(){
   const stats=getSupportStats();
   const total=document.getElementById('insight-total'); if(total)total.textContent=stats.length;
-
   const clients=topFromCount(countBy(stats.filter(x=>x.client!=='Sem nome'),'client'),3);
   const questions=topFromCount(countBy(stats,'question'),3);
-
-  const topClient=document.getElementById('insight-top-client');
-  const topClientCount=document.getElementById('insight-top-client-count');
-  if(topClient)topClient.textContent=clients[0]?.[0]||'—';
-  if(topClientCount)topClientCount.textContent=clients[0]?`${clients[0][1]} aparição(ões)`:'Nenhum histórico ainda';
-
-  const topQuestion=document.getElementById('insight-top-question');
-  const topQuestionCount=document.getElementById('insight-top-question-count');
-  if(topQuestion)topQuestion.textContent=questions[0]?.[0]||'—';
-  if(topQuestionCount)topQuestionCount.textContent=questions[0]?`${questions[0][1]} vez(es) no chat`:'Aguardando testes';
-
+  const topClient=document.getElementById('insight-top-client'); const topClientCount=document.getElementById('insight-top-client-count');
+  if(topClient)topClient.textContent=clients[0]?.[0]||'—'; if(topClientCount)topClientCount.textContent=clients[0]?`${clients[0][1]} aparição(ões)`:'Nenhum histórico ainda';
+  const topQuestion=document.getElementById('insight-top-question'); const topQuestionCount=document.getElementById('insight-top-question-count');
+  if(topQuestion)topQuestion.textContent=questions[0]?.[0]||'—'; if(topQuestionCount)topQuestionCount.textContent=questions[0]?`${questions[0][1]} vez(es) no chat`:'Aguardando testes';
   renderRanking('top-clients-list',clients,'Os nomes vão aparecer aqui conforme você testar o chat.',{subtitle:'cliente citado'});
   renderRanking('top-questions-list',questions,'As dúvidas mais repetidas vão aparecer aqui.',{subtitle:'tipo de dúvida'});
-
   const riskyStats=stats.filter(x=>x.risk==='alto'||x.risk==='medio');
   const riskyCounts=topFromCount(countBy(riskyStats.filter(x=>x.client!=='Sem nome'),'client'),3);
-  const riskMap={};
-  const extraMap={};
-  riskyStats.forEach(item=>{
-    if(item.client==='Sem nome')return;
-    if(item.risk==='alto'||!riskMap[item.client])riskMap[item.client]=item.risk;
-    extraMap[item.client]=item.question;
-  });
+  const riskMap={}; const extraMap={};
+  riskyStats.forEach(item=>{if(item.client==='Sem nome')return;if(item.risk==='alto'||!riskMap[item.client])riskMap[item.client]=item.risk;extraMap[item.client]=item.question;});
   renderRanking('problem-clients-list',riskyCounts,'Casos com urgência, cobrança ou risco vão aparecer aqui.',{risk:riskMap,extra:extraMap});
 }
-function clearSupportStats(){
-  if(!confirm('Zerar o histórico do mini painel?'))return;
-  localStorage.removeItem(SUPPORT_STATS_KEY);
-  renderSupportInsights();
-  toast('Mini painel zerado.');
+function clearSupportStats(){if(!confirm('Zerar o histórico do mini painel?'))return;localStorage.removeItem(SUPPORT_STATS_KEY);renderSupportInsights();toast('Mini painel zerado.');}
+function personalizeReadyAnswer(text,nome){
+  let resposta=String(text||'').trim(); if(!resposta)return '';
+  if(nome){resposta=resposta.replace(/\[NOME\]|\(nome\)|\{nome\}/gi,nome); if(!/^ol[áa][,\s]/i.test(resposta)) resposta=`Olá, ${nome}.\n\n${resposta}`;}
+  else{resposta=resposta.replace(/\[NOME\]|\(nome\)|\{nome\}/gi,''); if(!/^ol[áa][,\s]/i.test(resposta)) resposta=`Olá.\n\n${resposta}`;}
+  return resposta;
+}
+function scoreKnowledgeItemIA(raw,item){
+  const text=normalizeTextIA(raw); const combined=normalizeTextIA(`${item.title} ${item.type} ${item.subtype} ${item.content} ${(item.keywords||[]).join(' ')}`);
+  const words=tokenizeIA(raw); let score=Number(item.priority||0)/3;
+  const phrases=(item.keywords||[]).map(normalizeTextIA).filter(Boolean);
+  phrases.forEach(p=>{if(text.includes(p))score+=p.includes(' ')?28:10;});
+  words.forEach(w=>{if(combined.includes(w))score+=2;});
+  const title=normalizeTextIA(item.title); if(title&&text.includes(title))score+=35;
+  return score;
 }
 function findPortalAnswer(raw){
-  const textNorm=normalizeTextIA(raw);
-  const words=tokenizeIA(raw);
+  const scenario=detectScenarioIA(raw);
   const base=getPortalKnowledgeBase();
-  let best=null;
-  const keywordGroups=[
-    {keys:['protocolo','retorno','status','acompanhar','resposta','consulta'],pts:10},
-    {keys:['prazo','atrasado','atrasada','fora prazo','fora do prazo'],pts:10},
-    {keys:['ilegivel','borrado','cortado','documento','anexo','foto','incorreto','incorreta'],pts:10},
-    {keys:['prefeitura','oficial','golpe','confiavel','seguro','verdade'],pts:12},
-    {keys:['codigo','acesso','bloqueado','vencido','renovar','renovacao'],pts:8},
-    {keys:['pagamento','pix','comprovante','valor','pagar'],pts:8},
-    {keys:['erro','travou','bug','abre','falha','tela branca','consigo'],pts:8},
-    {keys:['excluir','apagar','remover','lgpd','dados'],pts:8}
-  ];
-  base.forEach(item=>{
-    const combined=normalizeTextIA(`${item.title} ${item.type} ${item.subtype} ${item.content}`);
-    let score=0;
-    words.forEach(w=>{ if(combined.includes(w)) score+=2; });
-    const title=normalizeTextIA(item.title);
-    if(title && textNorm.includes(title)) score+=12;
-    keywordGroups.forEach(g=>{
-      const inputHit=g.keys.some(k=>textNorm.includes(normalizeTextIA(k)));
-      const baseHit=g.keys.some(k=>combined.includes(normalizeTextIA(k)));
-      if(inputHit&&baseHit) score+=g.pts;
-    });
-    if(!best||score>best.score)best={...item,score};
-  });
-  return best&&best.score>=8?best:null;
+  let candidates=base.map(item=>({...item,score:scoreKnowledgeItemIA(raw,item)}));
+  if(scenario.id!=='generico'){
+    const scen=normalizeTextIA(`${scenario.label} ${scenario.id}`);
+    candidates=candidates.map(item=>{const box=normalizeTextIA(`${item.title} ${item.type} ${item.subtype}`);return {...item,score:item.score+(box.includes(scen.split(' ')[0])?18:0)};});
+  }
+  candidates=candidates.filter(x=>x.score>=18).sort((a,b)=>b.score-a.score);
+  return candidates[0]||null;
 }
-function personalizeReadyAnswer(text,nome){
-  let resposta=String(text||'').trim();
-  if(!resposta)return '';
-  if(nome){
-    resposta=resposta.replace(/\[NOME\]|\(nome\)|\{nome\}/gi,nome);
-    if(!/^ol[áa][,\s]/i.test(resposta)) resposta=`Olá, ${nome}.\n\n${resposta}`;
-  }else{
-    resposta=resposta.replace(/\[NOME\]|\(nome\)|\{nome\}/gi,'');
-    if(!/^ol[áa][,\s]/i.test(resposta)) resposta=`Olá.\n\n${resposta}`;
-  }
-  return resposta;
-}
-function hasAnyIA(text,patterns){
-  const value=normalizeTextIA(text||'');
-  return patterns.some(p=>value.includes(normalizeTextIA(p)));
-}
-function firstNameIA(nome){
-  return String(nome||'').trim().split(/\s+/)[0]||'';
-}
-function greetingIA(nome){
-  const first=firstNameIA(nome);
-  return first?`Olá, ${first}.`:'Olá.';
-}
-function closeHumanIA(extra=''){
-  return extra || 'Se puder, me manda essas informações que eu verifico com mais segurança.';
-}
-function humanizePortalAnswer(found,nome,raw){
-  const text=normalizeTextIA(raw);
-  const title=normalizeTextIA(found?.title||'');
-  const all=`${title} ${text}`;
-  const oi=greetingIA(nome);
-
-  // PRIORIDADE MÁXIMA: pedidos perigosos ou impossíveis
-  if(hasAnyIA(all,['colocar outra data','mudar a data','alterar data','jeitinho','dar um jeito','fazer passar','data diferente'])){
-    return `${oi}\n\nEntendo a situação, mas isso eu não consigo fazer.\n\nO formulário precisa ser enviado com as informações verdadeiras, conforme o atestado e os documentos.\n\nO que eu posso fazer é te orientar sobre o envio correto e verificar qual é a melhor forma de seguir dentro do que o órgão permite.`;
-  }
-
-  // Golpe / Prefeitura / dados sempre vem antes de documento
-  if(hasAnyIA(all,['golpe','estranho','confiavel','confiável','seguro','verdade','prefeitura','oficial','dados','cpf','documentos','vinculo','vínculo'])){
-    return `${oi}\n\nEntendo sua preocupação, de verdade.\n\nO Atestado Fácil não é um aplicativo da Prefeitura e não temos vínculo com órgão público.\n\nSomos uma ferramenta independente para ajudar no preenchimento e envio do formulário de perícia médica por e-mail.\n\nOs dados e documentos são usados para montar e enviar a solicitação que você pediu.\n\nSe preferir, eu te explico o passo a passo antes de você enviar qualquer documento.`;
-  }
-
-  if(hasAnyIA(all,['garante','garantia','vai ser aceito','aceito','deferido','deferimento','aprovar','resultado'])){
-    return `${oi}\n\nQuero ser bem transparente com você.\n\nA gente ajuda no preenchimento, organiza os documentos e faz o envio por e-mail.\n\nMas não conseguimos garantir aceitação, deferimento, prazo de resposta ou resultado, porque a análise é feita pelo órgão responsável.\n\nO nosso papel é facilitar o envio e acompanhar o e-mail até chegar uma resposta.`;
-  }
-
-  if(hasAnyIA(all,['entra no sistema','sistema da prefeitura','acesso interno','consulta pra mim','ver no sistema','olha no sistema'])){
-    return `${oi}\n\nNós não temos acesso interno ao sistema da Prefeitura ou da perícia.\n\nO que conseguimos acompanhar é o e-mail usado no envio da solicitação.\n\nAssim que o órgão responder por e-mail, nós repassamos a orientação ou protocolo para você.`;
-  }
-
-  if(hasAnyIA(all,['paguei','ninguém respondeu','ninguem respondeu','vou reclamar','quero meu dinheiro','propaganda enganosa','resolver hoje','vocês têm que resolver','voces tem que resolver','não recebi nada','nao recebi nada'])){
-    return `${oi}\n\nEntendo sua chateação. Vou verificar isso com atenção.\n\nMe envie, por favor, o nome cadastrado e a data do envio.\n\nA gente acompanha o e-mail até o órgão responder, mas o prazo de análise e a decisão final dependem da perícia.\n\nAssim que tiver qualquer retorno, te passamos por aqui.`;
-  }
-
-  if(hasAnyIA(all,['protocolo agora','preciso do protocolo','cade o protocolo','cadê o protocolo','comprovante','protocolo','retorno','status','acompanhar','consulta'])){
-    return `${oi}\n\nVocê enviou que dia?\n\nO protocolo só é repassado quando o órgão responde o e-mail da solicitação.\n\nAntes dessa resposta, ainda não existe protocolo do órgão para enviar.\n\nMe passando a data do envio, eu verifico melhor a situação para você.`;
-  }
-
-  if(hasAnyIA(all,['prazo','atrasado','atrasada','fora prazo','fora do prazo','perdi o prazo','inicio do afastamento','início do afastamento','2 dias uteis','2 dias úteis','comecei hoje'])){
-    return `${oi}\n\nMe fala duas datas, por favor:\n\n1. a data de início do afastamento;\n2. a data em que você enviou ou tentou enviar.\n\nO servidor deve solicitar a perícia em até 2 dias úteis após o início do afastamento.\n\nCom essas datas, eu consigo conferir melhor antes de te orientar.`;
-  }
-
-  if(hasAnyIA(all,['ilegivel','ilegível','borrado','borrada','cortado','cortada','foto escura','sombra','rasurado','documento ruim','anexo errado','incorreto','incorreta'])){
-    return `${oi}\n\nPara evitar problema com a perícia, o ideal é enviar o documento bem nítido, completo e sem cortes.\n\nSe a foto ficou escura, borrada ou com alguma parte cortada, me envie novamente antes do novo envio.\n\nAssim conseguimos orientar com mais segurança.`;
-  }
-
-  if(hasAnyIA(all,['codigo','código','acesso','login','celular novo','troquei de celular','não entra','nao entra','bloqueado','vencido'])){
-    return `${oi}\n\nMe envie um print da tela, por favor.\n\nAssim eu consigo ver se é erro no código, acesso vencido, troca de celular ou necessidade de nova liberação.\n\nCom o print fica mais fácil te orientar certinho.`;
-  }
-
-  if(hasAnyIA(all,['alterar','corrigir','errado','mudar','trocar','cargo','matricula','matrícula'])){
-    return `${oi}\n\nMe fala exatamente qual dado precisa ser corrigido.\n\nVou verificar se ainda conseguimos ajustar antes de um novo envio ou se será necessário fazer uma nova solicitação.\n\nPode me mandar o dado correto por aqui.`;
-  }
-
-  return makeMoreHumanIA(personalizeReadyAnswer(found?.content||'',nome),nome,raw);
-}
-function makeMoreHumanIA(text,nome,raw){
-  let resposta=String(text||'').trim();
-  const oi=greetingIA(nome);
-  if(!resposta){
-    return `${oi}\n\nEntendi. Para eu te orientar melhor, me manda mais detalhes do que apareceu e, se possível, um print da tela.\n\nAssim consigo verificar com mais segurança antes de te responder.`;
-  }
-  resposta=resposta
-    .replace(/\bNão\.\s*/g,'')
-    .replace(/O usuário deve/gi,'Você pode')
-    .replace(/É necessário/gi,'Preciso que')
-    .replace(/deve ser feito/gi,'precisa ser feito')
-    .replace(/de responsabilidade exclusiva do órgão responsável/gi,'depende do órgão responsável')
-    .trim();
-  if(!/^ol[áa][,\.\s]/i.test(resposta)) resposta=`${oi}\n\n${resposta}`;
-  return resposta;
+function directReplyByScenario(raw){
+  const t=normalizeTextIA(raw); const nome=extractClientName(raw); const oi=nome?`Olá, ${nome}.`:'Olá.'; const sc=detectScenarioIA(raw);
+  const replies={
+    irregular:`${oi}\n\nNesse caso, não conseguimos alterar data, documento ou informação para tentar fazer a solicitação passar.\n\nO formulário precisa ser enviado com as informações verdadeiras, conforme o atestado e os documentos.\n\nPosso te ajudar a organizar o envio correto, mas sem mudar dados ou conteúdo médico.`,
+    privacy:`${oi}\n\nEntendo sua preocupação.\n\nOs dados e documentos são usados para montar e enviar a solicitação que você pediu.\n\nO Atestado Fácil não é sistema da Prefeitura e não deve ser confundido com órgão público.\n\nSe quiser, eu te explico exatamente quais informações entram no formulário antes de você continuar.`,
+    golpe:`${oi}\n\nEntendo sua dúvida.\n\nO Atestado Fácil não é da Prefeitura e não é um sistema oficial do órgão.\n\nÉ uma ferramenta independente para facilitar o preenchimento e envio do formulário de perícia médica por e-mail.\n\nVocê também pode fazer o procedimento direto pelos canais oficiais, se preferir.`,
+    garantia:`${oi}\n\nNão consigo te prometer aceitação, deferimento ou prazo de resposta.\n\nO nosso trabalho é ajudar no preenchimento, organizar os documentos e enviar por e-mail.\n\nA análise e a decisão final ficam com o órgão responsável pela perícia.`,
+    brava:`${oi}\n\nEntendo sua insatisfação e vou verificar com atenção.\n\nMe envie o nome cadastrado e a data do envio, por favor.\n\nEu confiro a situação do envio e te retorno com uma posição, mas a resposta e análise dependem do órgão responsável.`,
+    sistema_prefeitura:`${oi}\n\nNós não temos acesso interno ao sistema da Prefeitura ou da perícia.\n\nO que fazemos é acompanhar o e-mail usado para o envio.\n\nQuando houver resposta do órgão, repassamos a orientação ou protocolo para você.`,
+    apagar_email:`${oi}\n\nDepois que o e-mail já foi enviado ao órgão, não conseguimos apagar ou trocar aquela mensagem na caixa de entrada deles.\n\nMe explique o que foi enviado errado para eu verificar se o melhor caminho é novo envio ou alguma complementação.`,
+    protocolo:`${oi}\n\nVocê enviou que dia?\n\nO protocolo só é repassado quando o órgão responde o e-mail da solicitação.\n\nAntes dessa resposta, ainda não existe protocolo do órgão para encaminhar.`,
+    prazo:`${oi}\n\nMe envie a data de início do afastamento e a data em que foi feito o envio.\n\nO servidor deve solicitar a perícia em até 2 dias úteis após o início do afastamento.\n\nCom essas datas, consigo conferir melhor antes de te orientar.`,
+    pagamento:`${oi}\n\nMe confirma o que aconteceu: você quer saber o valor, confirmar pagamento ou verificar liberação do acesso?\n\nSe já pagou, me envie o nome cadastrado e o comprovante ou horário aproximado do pagamento.`,
+    codigo:`${oi}\n\nMe envie um print da tela e o nome cadastrado, por favor.\n\nAssim verifico se é erro de digitação, acesso vencido, troca de celular ou necessidade de nova liberação.`,
+    erro_app:`${oi}\n\nMe envie um print da tela onde aparece o erro, por favor.\n\nTambém tente abrir pelo navegador do celular, como Chrome ou Safari.\n\nCom o print eu consigo entender melhor o que aconteceu.`,
+    doc_ruim:`${oi}\n\nPara evitar problema na análise, o documento precisa estar nítido, completo e sem cortes.\n\nSe ficou escuro, rasurado, cortado ou difícil de ler, o ideal é reenviar uma versão melhor antes de seguir.`,
+    dados_errados:`${oi}\n\nMe informe exatamente qual dado saiu errado e qual é a informação correta.\n\nVou verificar se ainda conseguimos corrigir antes de um novo envio ou se será necessário fazer outra solicitação.`,
+    outra_prefeitura:`${oi}\n\nO Atestado Fácil foi pensado para o formulário de perícia médica relacionado à Prefeitura de Contagem.\n\nPara outra Prefeitura ou órgão, o procedimento pode ser diferente.\n\nAntes de usar, é melhor confirmar se o formulário e o canal de envio são os mesmos.`,
+    agendamento:`${oi}\n\nNós não marcamos a perícia diretamente.\n\nO Atestado Fácil ajuda no preenchimento do formulário, organização dos documentos e envio por e-mail.\n\nDepois acompanhamos o e-mail até haver resposta do órgão.`,
+    como_funciona:`${oi}\n\nFunciona assim: você cadastra os dados, seleciona o tipo de atestado, anexa os documentos e clica para enviar.\n\nO sistema monta o formulário e envia por e-mail.\n\nDepois acompanhamos o e-mail até o órgão responder.`
+  };
+  return replies[sc.id]||'';
 }
 function buildAiReply(raw){
-  const text=normalizeTextIA(raw);
   const nome=extractClientName(raw);
-  const oi=greetingIA(nome);
+  const direct=directReplyByScenario(raw);
   const found=findPortalAnswer(raw);
-
-  // Mesmo se encontrar uma dúvida parecida, a humanização decide pela intenção mais importante.
-  if(found){
-    const resposta=humanizePortalAnswer(found,nome,raw);
-    return `Recomendo responder assim:\n\n${resposta}`;
-  }
-
   let resposta='';
-
-  if(hasAnyIA(text,['colocar outra data','mudar a data','alterar data','jeitinho','dar um jeito','fazer passar','data diferente'])){
-    resposta=`${oi}\n\nEntendo a situação, mas isso eu não consigo fazer.\n\nO formulário precisa ser enviado com as informações verdadeiras, conforme o atestado e os documentos.\n\nPosso te ajudar com o envio correto e verificar qual é a melhor forma de seguir dentro do procedimento.`;
-  }else if(hasAnyIA(text,['golpe','estranho','confiavel','confiável','seguro','prefeitura','oficial','dados','cpf','documentos','vinculo','vínculo'])){
-    resposta=`${oi}\n\nEntendo sua preocupação, de verdade.\n\nO Atestado Fácil não é um aplicativo da Prefeitura e não temos vínculo com órgão público.\n\nSomos uma ferramenta independente para ajudar no preenchimento e envio do formulário de perícia médica por e-mail.\n\nOs dados e documentos são usados para montar e enviar a solicitação que você pediu.\n\nSe preferir, eu te explico o passo a passo antes de você enviar qualquer documento.`;
-  }else if(hasAnyIA(text,['garante','garantia','vai ser aceito','aceito','deferido','deferimento','aprovar','resultado'])){
-    resposta=`${oi}\n\nQuero ser bem transparente com você.\n\nA gente ajuda no preenchimento, organiza os documentos e faz o envio por e-mail.\n\nMas não conseguimos garantir aceitação, deferimento, prazo de resposta ou resultado, porque a análise é feita pelo órgão responsável.`;
-  }else if(hasAnyIA(text,['entra no sistema','sistema da prefeitura','acesso interno','consulta pra mim','ver no sistema'])){
-    resposta=`${oi}\n\nNós não temos acesso interno ao sistema da Prefeitura ou da perícia.\n\nO que conseguimos acompanhar é o e-mail usado no envio da solicitação.\n\nAssim que o órgão responder por e-mail, repassamos a orientação ou protocolo para você.`;
-  }else if(hasAnyIA(text,['paguei','ninguém respondeu','ninguem respondeu','vou reclamar','quero meu dinheiro','propaganda enganosa','resolver hoje','vocês têm que resolver','voces tem que resolver','não recebi nada','nao recebi nada'])){
-    resposta=`${oi}\n\nEntendo sua chateação. Vou verificar isso com atenção.\n\nMe envie, por favor, o nome cadastrado e a data do envio.\n\nA gente acompanha o e-mail até o órgão responder, mas o prazo de análise e a decisão final dependem da perícia.`;
-  }else if(hasAnyIA(text,['protocolo','comprovante','retorno','resposta do orgao','resposta do órgão','status','acompanhar','consulta'])){
-    resposta=`${oi}\n\nVocê enviou que dia?\n\nO protocolo só é repassado quando o órgão responde o e-mail da solicitação.\n\nAntes dessa resposta, ainda não existe protocolo do órgão para enviar.\n\nMe passando a data do envio, eu verifico melhor a situação para você.`;
-  }else if(hasAnyIA(text,['fora do prazo','atrasad','perdi o prazo','prazo','inicio do afastamento','início do afastamento'])){
-    resposta=`${oi}\n\nMe fala duas datas, por favor:\n\n1. a data de início do afastamento;\n2. a data em que você enviou ou tentou enviar.\n\nO servidor deve solicitar a perícia em até 2 dias úteis após o início do afastamento.\n\nCom essas datas, eu consigo conferir melhor antes de te orientar.`;
-  }else if(hasAnyIA(text,['ilegivel','ilegível','foto escura','borrad','cortad','rasurado','documento ruim','anexo errado','incorreta','errado'])){
-    resposta=`${oi}\n\nPara evitar problema com a perícia, o ideal é enviar o documento bem nítido, completo e sem cortes.\n\nSe a foto ficou escura, borrada ou com alguma parte cortada, me envie novamente antes do novo envio.\n\nAssim conseguimos orientar com mais segurança.`;
-  }else if(hasAnyIA(text,['erro','nao abre','não abre','trav','bug','nao consigo','não consigo','falha','tela branca'])){
-    resposta=`${oi}\n\nMe manda um print da tela onde aparece o erro, por favor.\n\nSe conseguir, tente também fechar e abrir o app novamente.\n\nCom o print eu consigo entender melhor o que aconteceu e te orientar.`;
-  }else if(hasAnyIA(text,['codigo','código','acesso','não funciona','nao funciona','bloqueado','vencido','renovar','renovacao','renovação'])){
-    resposta=`${oi}\n\nMe envie um print da tela, por favor.\n\nAssim eu consigo ver se é erro no código, acesso vencido, troca de celular ou necessidade de nova liberação.\n\nCom o print fica mais fácil te orientar certinho.`;
-  }else if(hasAnyIA(text,['alterar','corrigir','errado','mudar','trocar'])){
-    resposta=`${oi}\n\nMe fala exatamente qual dado precisa ser corrigido.\n\nVou verificar se ainda conseguimos ajustar antes de um novo envio ou se será necessário fazer uma nova solicitação.\n\nPode me mandar o dado correto por aqui.`;
-  }else{
-    resposta=`${oi}\n\nEntendi. Para eu te orientar melhor, me manda mais detalhes do que apareceu e, se possível, um print da tela.\n\nAssim consigo verificar com mais segurança antes de te responder.\n\nSó reforçando: o Atestado Fácil ajuda no preenchimento e envio por e-mail, mas a análise e resposta são feitas pelo órgão responsável.`;
-  }
-  return `Recomendo responder assim:\n\n${resposta}`;
+  if(direct)resposta=direct;
+  else if(found)resposta=personalizeReadyAnswer(found.content,nome);
+  else resposta=`${nome?`Olá, ${nome}.`:'Olá.'}\n\nMe envia mais detalhes do que aconteceu, por favor?\n\nSe tiver print, data do envio ou resposta do órgão, manda também. Assim consigo te orientar com mais segurança.`;
+  return resposta.replace(/\n{3,}/g,'\n\n').trim();
 }
 function addAiBubble(role,text){
   const log=document.getElementById('ai-chat-log'); if(!log)return;
