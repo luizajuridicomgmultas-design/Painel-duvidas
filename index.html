@@ -1278,13 +1278,9 @@ async function generateAiReply(){
 function copyAiReply(){
   if(!lastAiReply)return toast('Gere uma resposta primeiro.');
   const clean=String(lastAiReply)
-    .replace(/^Recomendo responder assim:
-
-/i,'')
+    .replace(/^Recomendo responder assim:\n\n/i,'')
     .replace(/^Resposta sugerida:\s*/i,'')
-    .replace(/
-
-Observação interna:[\s\S]*$/i,'')
+    .replace(/\n\nObservação interna:[\s\S]*$/i,'')
     .replace(/Observação interna:[\s\S]*$/i,'')
     .trim();
   copy(clean);
