@@ -823,16 +823,6 @@ Mensagem dela: O órgão respondeu que a documentação está ilegível. O que e
             </div>
             <div id="problem-clients-list" class="ranking-list"></div>
           </div>
-
-          <div class="card">
-            <h2>Exemplos rápidos</h2>
-            <div class="ai-examples">
-              <button class="ai-example" onclick="setAiExample('Cliente: Angela\nMensagem dela: Meu atestado foi enviado fora do prazo. E agora?')">Fora do prazo</button>
-              <button class="ai-example" onclick="setAiExample('Cliente: Carla\nMensagem dela: O órgão respondeu que meu documento está ilegível.')">Documento ilegível</button>
-              <button class="ai-example" onclick="setAiExample('Cliente: João\nMensagem dele: Já enviei. Como acompanho o protocolo?')">Acompanhar protocolo</button>
-              <button class="ai-example" onclick="setAiExample('Cliente: Maria\nMensagem dela: O app não está abrindo no meu celular.')">Erro no app</button>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -1338,8 +1328,8 @@ function renderSupportInsights(){
   const stats=getSupportStats();
   const total=document.getElementById('insight-total'); if(total)total.textContent=stats.length;
 
-  const clients=topFromCount(countBy(stats.filter(x=>x.client!=='Sem nome'),'client'),5);
-  const questions=topFromCount(countBy(stats,'question'),5);
+  const clients=topFromCount(countBy(stats.filter(x=>x.client!=='Sem nome'),'client'),3);
+  const questions=topFromCount(countBy(stats,'question'),3);
 
   const topClient=document.getElementById('insight-top-client');
   const topClientCount=document.getElementById('insight-top-client-count');
@@ -1355,7 +1345,7 @@ function renderSupportInsights(){
   renderRanking('top-questions-list',questions,'As dúvidas mais repetidas vão aparecer aqui.',{subtitle:'tipo de dúvida'});
 
   const riskyStats=stats.filter(x=>x.risk==='alto'||x.risk==='medio');
-  const riskyCounts=topFromCount(countBy(riskyStats.filter(x=>x.client!=='Sem nome'),'client'),5);
+  const riskyCounts=topFromCount(countBy(riskyStats.filter(x=>x.client!=='Sem nome'),'client'),3);
   const riskMap={};
   const extraMap={};
   riskyStats.forEach(item=>{
@@ -1502,7 +1492,7 @@ function buildAiReply(raw){
   // Mesmo se encontrar uma dúvida parecida, a humanização decide pela intenção mais importante.
   if(found){
     const resposta=humanizePortalAnswer(found,nome,raw);
-    return `Recomendo responder assim:\n\n${resposta}\n\nObservação interna: usei a base do painel e priorizei a intenção principal da cliente. Revise antes de enviar.`;
+    return `Recomendo responder assim:\n\n${resposta}`;
   }
 
   let resposta='';
@@ -1532,7 +1522,7 @@ function buildAiReply(raw){
   }else{
     resposta=`${oi}\n\nEntendi. Para eu te orientar melhor, me manda mais detalhes do que apareceu e, se possível, um print da tela.\n\nAssim consigo verificar com mais segurança antes de te responder.\n\nSó reforçando: o Atestado Fácil ajuda no preenchimento e envio por e-mail, mas a análise e resposta são feitas pelo órgão responsável.`;
   }
-  return `Recomendo responder assim:\n\n${resposta}\n\nObservação interna: resposta gerada pelo próprio painel, com tom mais humano e limites de responsabilidade.`;
+  return `Recomendo responder assim:\n\n${resposta}`;
 }
 function addAiBubble(role,text){
   const log=document.getElementById('ai-chat-log'); if(!log)return;
